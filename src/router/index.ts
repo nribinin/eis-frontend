@@ -29,6 +29,16 @@ const router = createRouter({
         role:[Roles.STUDENT]
       }
     },
+    {
+      path: "/admin",
+      name: "admin",
+      component: () => import("@/views/AdminView.vue"),
+    },
+    {
+      path: "/admin/database",
+      name: "database",
+      component: () => import("@/views/AdminSokratesView.vue"),
+    }
   ],
 })
 
