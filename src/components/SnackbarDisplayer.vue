@@ -15,7 +15,7 @@ function snackbarTimeout(open: boolean): void {
     location="top"
     :model-value="snackbar.open"
     @update:model-value="snackbarTimeout"
-    :timeout="snackbar.current?.timeout ?? 2000"
+    :timeout="snackbar.current?.timeout ?? 5000"
   >
     {{ snackbar.current?.message ?? "" }}
 
@@ -24,6 +24,7 @@ function snackbarTimeout(open: boolean): void {
       </v-btn>
     </template>
   </v-snackbar>
+  
 </template>
 
 <style scoped></style>

@@ -1,19 +1,19 @@
 import { createApp } from "vue"
 import { createPinia } from "pinia"
+
+import 'materialize-css/dist/css/materialize.min.css'
+import App from "./App.vue"
+import router from "./router"
+import axios from "axios"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import "vuetify/styles"
-
-import App from "./App.vue"
-import router from "./router"
-import axios from "axios"
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
 
 const app = createApp(App)
-
+app.use(createVuetify({ components, directives }))
 app.use(createPinia())
-app.use(createVuetify({ components, directives, theme: { defaultTheme: "light" } }))
 app.use(router)
 
 const snackbar = useSnackbarStore()

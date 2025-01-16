@@ -1,45 +1,50 @@
+<template>
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-box">
+        <form @submit.prevent="login" class="login-form">
+          <div class="input-group">
+            <label for="username">Username:</label>
+            <input type="text" v-model="form.username" placeholder="Enter your username" required/>
+          </div>
+          <div class="input-group">
+            <label for="password">Password:</label>
+            <input type="password" v-model="form.password" placeholder="Enter your password" required/>
+          </div>
+        </form>
+        <button @click="login">Log In</button>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref } from "vue"
 import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
 import type { LoginRequest } from "@/types/LoginRequest.ts"
 import { useRouter } from "vue-router"
-
+import { Roles } from "@/enum/Roles.ts"
 const authenticationStore = useAuthenticationStore()
 const router = useRouter()
 
 const form = ref<LoginRequest>({
-  username: "nribinin@student.tgm.ac.at",
+  username: "nribinin",
   password: "",
 })
 
 async function login() {
   const sucessful = await authenticationStore.login(form.value)
   if (sucessful) {
-    router.back()
+    if(authenticationStore.role === Roles.STUDENT) {
+      router.push("/schueler")
+    } else if(authenticationStore.role === Roles.TEACHER) {
+      router.push("/teacher")
+    }
   }
 }
 </script>
-<template>
-    <div class="login-page">
-      <div class="login-container">
-        <div class="login-box">
-          <form @submit.prevent="login">
-            <div>
-              <label for="username">Username:</label>
-              <input v-model="form.username" placeholder="Username eingeben" type="text" required></input>
-            </div>
-            <div>
-              <label for="password">Password:</label>
-              <input v-model="form.password" type="password" placeholder="Passwort eingeben" required></input>
-            </div>
-          </form>
-          <button @click="login">Login</button>
-        </div>
-      </div>
-    </div>
-  </template>
 
-<style scoped>
+<style>
 .login-page {
   display: flex;
   align-items: center;
@@ -116,7 +121,7 @@ async function login() {
     font-size: 0.75em;
   }
 
-  .login-box input, .login-box Button {
+  .login-box input, .login-box button {
     padding: 0.5em;
   }
 }

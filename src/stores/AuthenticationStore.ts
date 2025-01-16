@@ -9,6 +9,8 @@ import type { RouteLocationResolvedGeneric } from "vue-router"
 export const useAuthenticationStore = defineStore("authentication", () => {
   const loggedIn = ref(false)
   const role = ref<Roles | null>(null)
+  const displayName = ref<string | null>(null); // Neuer Zustand
+
 
   //const doubleCount = computed(() => count.value * 2)
   async function login(loginRequest: LoginRequest): Promise<boolean> {
@@ -36,16 +38,14 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
   function setAuthentication(data: Authentication) {
     const authorities = data.authorities.map((value) => value.authority)
-    console.log(authorities)
+    displayName.value = data.details.displayName
     if (authorities.includes("ROLE_LEHRER")) {
       loggedIn.value = true
       role.value = Roles.TEACHER
     } else if (authorities.includes("ROLE_SCHUELER")) {
-      console.log("Hier bin ich")
       loggedIn.value = true
       role.value = Roles.STUDENT
     } else {
-      console.log("Hier bin ich Nummer 2")
       loggedIn.value = false
       role.value = null
     }
@@ -82,5 +82,5 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
   void checkLoggedIn()
 
-  return { loggedIn, login, logout, role, isRouteVisible }
+  return { loggedIn, login, logout, role, isRouteVisible, displayName }
 })
