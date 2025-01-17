@@ -11,12 +11,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: "/login",
+      path: "/",
       name: "login",
       component: LoginView,
     },
@@ -27,6 +22,15 @@ const router = createRouter({
       meta: {
         authRequired: true,
         role:[Roles.STUDENT]
+      }
+    },
+    {
+      path: "/lehrer",
+      name: "lehrer",
+      component: () => import("@/views/LehrerView.vue"),
+      meta: {
+        authRequired: true,
+        role:[Roles.TEACHER]
       }
     },
     {
@@ -61,7 +65,7 @@ router.beforeResolve((to, from, next) => {
     !to.meta.role.includes(auth.role)
   ) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.")
-    router.push("/login")
+    router.back()
   }
   next()
 })

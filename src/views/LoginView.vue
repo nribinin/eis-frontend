@@ -9,11 +9,11 @@
                         </li>
                         <div>
                             <li>
-                                <router-link to="/login" @click="changeView('Login', 'Anmeldeseite')"
+                                <router-link to="/" @click="changeView('Login', 'Anmeldeseite')"
                                     :class="{ 'selectedSite': activeComponent === 'Login' }">Anmeldeseite</router-link>
                             </li>
                             <li>
-                                <router-link to="/login" @click="changeView('Lernbetreuung', 'Lernbetreuung')"
+                                <router-link to="/" @click="changeView('Lernbetreuung', 'Lernbetreuung')"
                                     :class="{ 'selectedSite': activeComponent === 'Lernbetreuung' }">Lernbetreuung</router-link>
                             </li>
                         </div>

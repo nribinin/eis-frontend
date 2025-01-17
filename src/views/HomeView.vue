@@ -2,7 +2,7 @@
   <div>
     <nav>
       <ul>
-        <li><router-link to="/login">Login Ansicht</router-link></li>
+        <li><router-link to="/">Login Ansicht</router-link></li>
         <li><router-link to="/admin">Admin Ansicht</router-link></li>
         <li><router-link to="/lehrer">Lehrer Ansicht</router-link></li>
         <li><router-link to="/schueler">Schüler Ansicht</router-link></li>

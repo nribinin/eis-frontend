@@ -38,7 +38,7 @@ async function login() {
     if(authenticationStore.role === Roles.STUDENT) {
       router.push("/schueler")
     } else if(authenticationStore.role === Roles.TEACHER) {
-      router.push("/teacher")
+      router.push("/lehrer")
     }
   }
 }

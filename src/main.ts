@@ -32,7 +32,7 @@ axios.interceptors.response.use(null, (error) => {
   console.log("axios.interceptors.response error", error)
   if (error.response.status == 401) {
     snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.")
-    router.push("/login")
+    router.push("/")
   }
   if (error.response.status == 403) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.")

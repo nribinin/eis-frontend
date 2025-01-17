@@ -6,9 +6,7 @@
       </h3>
     </div>
     <div class="selectedSite:hover logout right">
-      <router-link to="/logout">
     <div class="material-icons" @click="logout">exit_to_app</div>
-  </router-link>
     </div>
   </nav>
 </template>
@@ -21,7 +19,7 @@ const authenticationStore = useAuthenticationStore()
 async function logout() {
   const success = await authenticationStore.logout();
   if (success) {
-    router.push("/login");
+    router.push("/");
   }
 }
 
@@ -37,5 +35,10 @@ console.log(title);
 
 .header {
   background-color: black;
+}
+.logout {
+  margin-right: 1em;
+  margin-top: 5px;
+  cursor: pointer;
 }
 </style>
