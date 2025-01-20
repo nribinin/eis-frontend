@@ -27,7 +27,16 @@ const router = createRouter({
     {
       path: "/lehrer",
       name: "lehrer",
-      component: () => import("@/views/LehrerView.vue"),
+      component: () => import("@/views/LehrerAmpelView.vue"),
+      meta: {
+        authRequired: true,
+        role:[Roles.TEACHER]
+      }
+    },
+    {
+      path: "/lehrer/kv",
+      name: "kv",
+      component: () => import("@/views/LehrerKVView.vue"),
       meta: {
         authRequired: true,
         role:[Roles.TEACHER]
