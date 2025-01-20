@@ -33,4 +33,4 @@ Ein Vue.js-Projekt mit TypeScript-Unterstützung, basierend auf einem früheren 
   npm run dev
    ```
 
-Anmeldung erfolgt mit TGM Cridentials (z.B. Username: nribinin & Passwort = <DeinPasswort>)
+Anmeldung erfolgt mit TGM Cridentials (z.B. Username: nribinin & Passwort = \<DeinPasswort\>)
