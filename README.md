@@ -23,6 +23,6 @@ Ein Vue.js-Projekt mit TypeScript-Unterstützung, basierend auf einem früheren 
    npm install
 
 ## Verwendung: 
-** ENtwicklungsserver starten: **
+**Entwicklungsserver starten:**
   ```bash
   npm run dev
