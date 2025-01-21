@@ -1,28 +1,29 @@
 <template>
   <div class="maincontainer">
-    <div class="fixed headcontainer">
-      <div class="header">
-        <nav>
-          <ul>
-            <li>
-              <h3>{{ title }}</h3>
-            </li>
-            <div class="selectedSite:hover logout right">
-              <div class="material-icons" @click="logout">exit_to_app</div>
-            </div>
-          </ul>
-        </nav>
+      <div class="fixed headcontainer">
+          <div class="header">
+              <nav>
+                  <ul>
+                      <li>
+                          <h3>{{ title }}</h3>
+                      </li>
+                      <div class="selectedSite:hover logout right">
+                        <div class="material-icons" @click="logout">exit_to_app</div>
+                                                    
+                      </div>
+                  </ul>
+              </nav>
+          </div>
+          <EditDatabase />
       </div>
-    </div>
 
-    <Admin />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useAuthenticationStore } from "@/stores/AuthenticationStore";
 import { useRouter } from "vue-router";
-import Admin from '@/components/AdminComponent.vue';
+import EditDatabase from '@/components/Admin/EditDatabase.vue';
 const authenticationStore = useAuthenticationStore();
 const router = useRouter();
 const title = "Datenbank bearbeiten";
@@ -53,6 +54,7 @@ async function logout() {
   padding: 1em 0;
   background-color: black; 
 }
+
 
 .fixed {
   position: sticky;
@@ -117,7 +119,6 @@ nav{
   font-size: 1em;
   color: #ffffff;
 }
-
 .logout {
   margin-right: 1em;
   cursor: pointer;

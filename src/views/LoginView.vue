@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import Login from '@/components/LoginComponent.vue';
-import Lernbetreuung from '@/components/LernbetreuungComponent.vue';
+import Login from '@/components/Login/LoginComponent.vue';
+import Lernbetreuung from '@/components/Login/LernbetreuungComponent.vue';
 
 export default {
     data() {

@@ -33,8 +33,8 @@
 </template>
 
 <script lang="ts" setup>
-import Teacher from '@/components/TeacherComponent.vue';
-import Legende from '@/components/TeacherHeader.vue';
+import Teacher from '@/components/Teacher/TeacherComponent.vue';
+import Legende from '@/components/Teacher/TeacherHeader.vue';
 import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
 import { useRouter } from "vue-router"
 const router = useRouter();

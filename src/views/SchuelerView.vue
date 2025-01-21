@@ -18,9 +18,9 @@
   
   
   <script>
-  import Legende from "@/components/LegendeKomp.vue";
-  import SchuelerTable from "@/components/SchuelerTable.vue";
-  import SchuelerHeader from "@/components/SchuelerHeader.vue";
+  import Legende from "@/components/Teacher/LegendeKomp.vue";
+  import SchuelerTable from "@/components/Students/SchuelerTable.vue";
+  import SchuelerHeader from "@/components/Students/SchuelerHeader.vue";
   
       export default {
         data() {

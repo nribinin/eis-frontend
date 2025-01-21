@@ -8,7 +8,7 @@
         <button @click="navigateTo('/admin/editkv')">Klassenvorstand bearbeiten</button>
       </div>
       <div class="button-box">
-        <button @click="navigateTo('/admin/schueler')">Schüler bearbeiten</button>
+        <button @click="navigateTo('/admin/editStudents')">Schüler bearbeiten</button>
       </div>
       <div class="button-box">
         <button @click="navigateTo('/admin/lehrer')">Lehrer bearbeiten</button>

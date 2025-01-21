@@ -23,7 +23,7 @@
   <script lang="ts" setup>
   import { useAuthenticationStore } from "@/stores/AuthenticationStore";
   import { useRouter } from "vue-router";
-  import EditKV from '@/components/AdminEditKV.vue';
+  import EditKV from '@/components/Admin/AdminEditKV.vue';
   const authenticationStore = useAuthenticationStore();
   const router = useRouter();
   const title = "Klassenvorstand bearbeiten";

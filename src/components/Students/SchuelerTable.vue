@@ -28,7 +28,7 @@
                 {{ group[0].subjectLangbezeichnung }}
                 <img
                   v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
-                  src="../assets/arrowDown_White.png"
+                  src="@/assets/arrowDown_White.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
                   @click="toggleGroup(index)"
@@ -36,7 +36,7 @@
                 />
                 <img
                   v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
-                  src="../assets/arrowUp_White.png"
+                  src="@/assets/arrowUp_White.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
                   @click="toggleGroup(index)"
@@ -44,7 +44,7 @@
                 />
                 <img
                   v-else-if="!expandedGroups.includes(index)"
-                  src="../assets/arrowDown.png"
+                  src="@/assets/arrowDown.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
                   @click="toggleGroup(index)"
@@ -52,7 +52,7 @@
                 />
                 <img
                   v-else-if="expandedGroups.includes(index)"
-                  src="../assets/arrowUp.png"
+                  src="@/assets/arrowUp.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
                   @click="toggleGroup(index)"

@@ -45,18 +45,23 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
-      component: () => import("@/views/AdminView.vue"),
+      component: () => import("@/views/Admin/AdminView.vue"),
     },
     {
       path: "/admin/database",
       name: "database",
-      component: () => import("@/views/AdminSokratesView.vue"),
+      component: () => import("@/views/Admin/AdminSokratesView.vue"),
     },
     {
       path: "/admin/editkv",
       name: "editkv",
-      component: () => import("@/views/AdminEditKVView.vue"),
+      component: () => import("@/views/Admin/AdminEditKVView.vue"),
     },
+    {
+      path: "/admin/editStudents",
+      name: "editStudents",
+      component: () => import("@/views/Admin/AdminEditStudentsView.vue"),
+    }
   ],
 })
 

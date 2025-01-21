@@ -5,7 +5,7 @@
       <div style="  background-color: white;">
         <div v-if="legendVisible" class="flex-container-Legend">
           <div class="flex-container-Horizontal">
-            <img class="imgHeight" src="../assets/Ampel_grün.png" />
+            <img class="imgHeight" src="@/assets/Ampel_grün.png" />
 
             <div class="flex-container-Vertical center-align">
               <h6 class="green roundedCorners" style="max-width: fit-content">Grün</h6>
@@ -14,7 +14,7 @@
           </div>
 
           <div class="flex-container-Horizontal">
-            <img class="imgHeight" src="../assets/Ampel_gelb.png" />
+            <img class="imgHeight" src="@/assets/Ampel_gelb.png" />
 
             <div class="flex-container-Vertical center-align">
               <h6 class="yellow roundedCorners" style="max-width: fit-content">Gelb</h6>
@@ -23,7 +23,7 @@
           </div>
 
           <div class="flex-container-Horizontal">
-            <img class="imgHeight" src="../assets/Ampel_rot.png" />
+            <img class="imgHeight" src="@/assets/Ampel_rot.png" />
 
             <div class="flex-container-Vertical center-align">
               <h6 class="red roundedCorners" style="max-width: fit-content">Rot</h6>
@@ -32,7 +32,7 @@
           </div>
 
           <div class="flex-container-Horizontal">
-            <img class="imgHeight" src="../assets/Ampel_schwarz.png" />
+            <img class="imgHeight" src="@/assets/Ampel_schwarz.png" />
 
             <div class="flex-container-Vertical center-align">
               <h6 class="black roundedCorners white-text" style="max-width: fit-content">

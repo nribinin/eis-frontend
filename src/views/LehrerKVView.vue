@@ -27,8 +27,8 @@
 </template>
 
 <script lang="ts" setup>
-import KV from '@/components/KVComponent.vue';
-import Legende from '@/components/TeacherHeader.vue';
+import KV from '@/components/Teacher/KVComponent.vue';
+import Legende from '@/components/Teacher/TeacherHeader.vue';
 
 import { useRouter } from "vue-router"
 const router = useRouter();
