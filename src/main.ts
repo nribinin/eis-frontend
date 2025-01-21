@@ -19,7 +19,7 @@ app.use(router)
 const snackbar = useSnackbarStore()
 
 const port = 8080
-axios.defaults.baseURL = "http://localhost:" + port
+axios.defaults.baseURL = "http://10.0.106.127:" + port
 axios.defaults.withCredentials = true
 axios.defaults.withXSRFToken = true
 axios.defaults.xsrfCookieName = "XSRF-TOKEN"

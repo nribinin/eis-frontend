@@ -37,42 +37,38 @@
       <table class="striped">
         <thead class="fixed">
           <tr>
-            <!-- Nachname Vorname + Sortier-Pfeil -->
+            <!-- Nachname + Vorname -->
             <th class="col s3">
               <div class="icontext">
                 <i class="material-icons">person</i> Schüler
                 <button @click="sortBy('name')" class="legend-toggle">
-                  <!-- Pfeil nur zeigen, wenn sortColumn === 'name' -->
-                  <span v-if="sortColumn === 'name'">
-                    <span v-if="sortDirection === 'desc'">▼</span>
-                    <span v-else>▲</span>
-                  </span>
+                  <span v-if="sortOrders.name === 'asc'">▲</span>
+                  <span v-else-if="sortOrders.name === 'desc'">▼</span>
+                  <span v-else>⇅</span>
                 </button>
               </div>
             </th>
 
-            <!-- Klasse + Sortier-Pfeil -->
+            <!-- Klasse -->
             <th class="col">
               <div class="icontext">
                 <i class="material-icons">class</i> Klasse
                 <button @click="sortBy('klasse')" class="legend-toggle">
-                  <span v-if="sortColumn === 'klasse'">
-                    <span v-if="sortDirection === 'desc'">▼</span>
-                    <span v-else>▲</span>
-                  </span>
+                  <span v-if="sortOrders.klasse === 'asc'">▲</span>
+                  <span v-else-if="sortOrders.klasse === 'desc'">▼</span>
+                  <span v-else>⇅</span>
                 </button>
               </div>
             </th>
 
-            <!-- Fach + Sortier-Pfeil -->
+            <!-- Fach -->
             <th class="col">
               <div class="icontext">
                 <i class="material-icons">school</i> Fach
                 <button @click="sortBy('fach')" class="legend-toggle">
-                  <span v-if="sortColumn === 'fach'">
-                    <span v-if="sortDirection === 'desc'">▼</span>
-                    <span v-else>▲</span>
-                  </span>
+                  <span v-if="sortOrders.fach === 'asc'">▲</span>
+                  <span v-else-if="sortOrders.fach === 'desc'">▼</span>
+                  <span v-else>⇅</span>
                 </button>
               </div>
             </th>
@@ -109,40 +105,35 @@
                     class="btn greenbtn"
                     :class="{ selectedgreen: student.selectedColor === 'GRUEN' }"
                     @click="toggleColor(student, 'GRUEN')"
-                    >Grün</span
-                  >
+                  >Grün</span>
                 </label>
                 <label>
                   <span
                     class="btn yellowbtn"
                     :class="{ selectedyellow: student.selectedColor === 'GELB' }"
                     @click="toggleColor(student, 'GELB')"
-                    >Gelb</span
-                  >
+                  >Gelb</span>
                 </label>
                 <label>
                   <span
                     class="btn redbtn"
                     :class="{ selectedred: student.selectedColor === 'ROT' }"
                     @click="toggleColor(student, 'ROT')"
-                    >Rot</span
-                  >
+                  >Rot</span>
                 </label>
                 <label>
                   <span
                     class="btn black"
                     :class="{ selectedblack: student.selectedColor === 'SCHWARZ' }"
                     @click="toggleColor(student, 'SCHWARZ')"
-                    >Schwarz</span
-                  >
+                  >Schwarz</span>
                 </label>
                 <label>
                   <span
                     class="btn whitebtn black-text"
                     :class="{ selectednichtzustaendig: student.selectedColor === 'GRAU' }"
                     @click="toggleColor(student, 'GRAU')"
-                    >Nicht Zuständig</span
-                  >
+                  >Nicht Zuständig</span>
                 </label>
               </div>
             </td>
@@ -171,26 +162,6 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Floating Save Button (optional, falls du das Gesamtspeichern willst) -->
-    <div class="fab-container">
-      <button
-        class="btn-floating btn-large waves-effect waves-light red"
-        @click="saveAllChanges"
-        @mouseover="showLabel = true"
-        @mouseleave="showLabel = false"
-      >
-        <i class="material-icons">save</i>
-      </button>
-      <div
-        class="fab-label"
-        v-show="showLabel"
-        @mouseover="showLabel = true"
-        @mouseleave="showLabel = false"
-      >
-        Speichern
-      </div>
-    </div>
   </div>
 </template>
 
@@ -202,8 +173,8 @@ interface AmpelStudent {
   lessonId: number;
   studentId: number;
   teacherId: number;
-  vname: string;          // Vorname
-  nname: string;          // Nachname
+  vname: string;    // Vorname
+  nname: string;    // Nachname
   klasse: string;
   fach: string;
   selectedColor: string | null; // "ROT", "GELB", "GRUEN", "SCHWARZ", "GRAU" oder null
@@ -225,89 +196,105 @@ export default defineComponent({
       weisseAmpel: false,
       nichtZustaendig: false,
       searchTerm: "",
-      sortColumn: "klasse" as "name" | "klasse" | "fach",
-      sortDirection: "asc" as "asc" | "desc",
+      // Für jede Spalte: asc / desc / null (aus)
+      sortOrders: {
+        name: null as 'asc' | 'desc' | null,
+        klasse: null as 'asc' | 'desc' | null,
+        fach: null as 'asc' | 'desc' | null
+      },
+      // Reihenfolge der Spalten, die (derzeit) sortiert werden
+      // Die erste Spalte in diesem Array hat die höchste Priorität.
+      // (Falls du umgekehrte Reihenfolge willst, kannst du das im Sortiercode anpassen.)
+      sortPriority: [] as string[],
+
       students: [] as AmpelStudent[],
     };
   },
   computed: {
     sortedAndFilteredStudents(): AmpelStudent[] {
-      // 1) Filter "nicht zuständig" (Farbe = GRAU)
-      //    => Nur zeigen, wenn "nichtZustaendig" true ist
-      let filtered = this.students.filter((st) => {
-        if (st.selectedColor === "GRAU" && !this.nichtZustaendig) {
-          return false; // ausblenden
+      // 1) Kopie erstellen
+      let filtered = [...this.students];
+
+      // 2) Filter anwenden
+      filtered = filtered.filter((student) => {
+        // A) "Nicht Zuständig" = GRAU ausblenden, wenn !nichtZustaendig
+        if (student.selectedColor === "GRAU" && !this.nichtZustaendig) {
+          return false;
+        }
+        // B) Weiße Ampel = nur null oder GRAU
+        if (this.weisseAmpel) {
+          const isNullOrGrau =
+            student.selectedColor === null || student.selectedColor === "GRAU";
+          if (!isNullOrGrau) {
+            return false;
+          }
+        }
+        // C) Suchbegriffe
+        if (this.searchTerm.trim().length > 0) {
+          const terms = this.searchTerm.toLowerCase().split("/").filter((t) => t.trim());
+          const fullName = (student.nname + " " + student.vname).toLowerCase();
+          const fullNameRev = (student.vname + " " + student.nname).toLowerCase();
+
+          const allMatch = terms.every(term => {
+            return (
+              student.nname.toLowerCase().includes(term) ||
+              student.vname.toLowerCase().includes(term) ||
+              fullName.includes(term) ||
+              fullNameRev.includes(term) ||
+              student.klasse.toLowerCase().includes(term) ||
+              student.fach.toLowerCase().includes(term)
+            );
+          });
+          if (!allMatch) {
+            return false;
+          }
         }
         return true;
       });
 
-      // 2) Filter "weisseAmpel": Nur Schüler, die noch keine Farbe haben oder "GRAU"
-      if (this.weisseAmpel) {
-        filtered = filtered.filter(
-          (st) => st.selectedColor === null || st.selectedColor === "GRAU"
-        );
-      }
-
-      // 3) Suchbegriff (Aufteilung mit "/")
-      if (this.searchTerm.trim().length > 0) {
-        const terms = this.searchTerm.toLowerCase().split("/").filter((t) => t.trim());
-        filtered = filtered.filter((st) =>
-          terms.every((term) => {
-            // Suche in Nachname, Vorname, Klasse, Fach, oder beidem
-            const fullName = (st.nname + " " + st.vname).toLowerCase();
-            const fullNameReverse = (st.vname + " " + st.nname).toLowerCase();
-            return (
-              st.nname.toLowerCase().includes(term) ||
-              st.vname.toLowerCase().includes(term) ||
-              fullName.includes(term) ||
-              fullNameReverse.includes(term) ||
-              st.klasse.toLowerCase().includes(term) ||
-              st.fach.toLowerCase().includes(term)
-            );
-          })
-        );
-      }
-
-      // 4) Sortierung
-      //    - "name" => sortiere nach Nachname, dann Vorname
-      //    - "klasse" => sortiere nach Klasse
-      //    - "fach" => sortiere nach Fach
+      // 3) Mehrfach-Sortierung
       filtered.sort((a, b) => {
-        let cmp = 0;
+        for (const col of this.sortPriority) {
+          const order = this.sortOrders[col as keyof typeof this.sortOrders];
+          if (!order) continue; // Falls zwischendurch null sein sollte
+          let cmp = 0;
 
-        if (this.sortColumn === "name") {
-          const aname = a.nname.toLowerCase() + " " + a.vname.toLowerCase();
-          const bname = b.nname.toLowerCase() + " " + b.vname.toLowerCase();
-          cmp = aname.localeCompare(bname);
-        } else if (this.sortColumn === "klasse") {
-          cmp = a.klasse.localeCompare(b.klasse);
-        } else if (this.sortColumn === "fach") {
-          cmp = a.fach.localeCompare(b.fach);
+          if (col === "name") {
+            const aname = a.nname.toLowerCase() + " " + a.vname.toLowerCase();
+            const bname = b.nname.toLowerCase() + " " + b.vname.toLowerCase();
+            cmp = aname.localeCompare(bname);
+          } else if (col === "klasse") {
+            cmp = a.klasse.toLowerCase().localeCompare(b.klasse.toLowerCase());
+          } else if (col === "fach") {
+            cmp = a.fach.toLowerCase().localeCompare(b.fach.toLowerCase());
+          }
+
+          if (cmp !== 0) {
+            return order === "asc" ? cmp : -cmp;
+          }
         }
-
-        return this.sortDirection === "asc" ? cmp : -cmp;
+        return 0;
       });
 
       return filtered;
     },
   },
+
   async created() {
     try {
       const response = await axios.get("/api/teacher-ampel/getLehrer");
       const data = response.data;
-      // Mappen auf AmpelStudent
+      // Backend -> Frontend Mapping
       this.students = data.map((ampel: any) => {
-        // Achte darauf, dass du die Felder so befüllst, wie das Backend sie liefert
         return {
           lessonId: ampel.lessonId,
           studentId: ampel.studentId,
           teacherId: ampel.teacherId,
-          // hier nur ein Beispiel, falls studentName "Mustermann Max" sein sollte:
-          nname: ampel.studentName.split(" ")[0] || "???",
-          vname: ampel.studentName.split(" ")[1] || "",
+          nname: ampel.studentName.split(" ")[1] || "???",
+          vname: ampel.studentName.split(" ")[0] || "",
           klasse: ampel.classroomName || "",
           fach: ampel.subjectLangbezeichnung || "",
-          selectedColor: ampel.farbe || null,  // "ROT", "GELB", ...
+          selectedColor: ampel.farbe || null,
           note: ampel.bemerkung || "",
         } as AmpelStudent;
       });
@@ -326,23 +313,18 @@ export default defineComponent({
           return "rowred";
         case "SCHWARZ":
           return "rowblack";
-        // GRAU oder null => kein extra row style
         default:
           return "";
       }
     },
 
     toggleColor(student: AmpelStudent, color: string) {
-      // Gleiches Anklicken => Farbe entfernen
+      // Gleiche Farbe erneut -> entfernen
       if (student.selectedColor === color) {
         student.selectedColor = null;
-        // Falls du beim Entfernen auch einen Request möchtest, kannst du hier
-        // z.B. den Wert auf "" oder null setzen und saveAmpel rufen:
-        // this.saveAmpel(student);
-        // return;
+        this.saveAmpel(student);
       } else {
         student.selectedColor = color;
-        // Sofort speichern
         this.saveAmpel(student);
       }
     },
@@ -350,68 +332,75 @@ export default defineComponent({
     onNoteChange(student: AmpelStudent, index: number) {
       this.editingIndex = -1;
       if (!student.selectedColor) {
-        // Falls keine Farbe => nur Fehlermeldung in der Konsole
-        console.log(
-          "Keine Ampelfarbe gesetzt, Bemerkung kann nicht gespeichert werden."
-        );
+        console.log("Keine Ampelfarbe gesetzt, Bemerkung kann nicht gespeichert werden.");
         return;
       }
-      // Wenn Bemerkung leer => "Keine Bemerkung"
       if (!student.note || student.note.trim().length === 0) {
         student.note = "Keine Bemerkung";
       }
-      // Speichern
       this.saveAmpel(student);
     },
 
     async saveAmpel(student: AmpelStudent) {
-      try {
-        const body = {
-          lessonId: student.lessonId,
-          studentId: student.studentId,
-          teacherId: student.teacherId,
-          farbe: student.selectedColor, // "ROT", "GELB", ...
-          bemerkung: student.note,
-        };
-        const response = await axios.post("/api/teacher-ampel", body);
-        // Optional: aktualisiere Felder aus der Response
-        const updated = response.data;
-        student.selectedColor = updated.farbe;
-        student.note = updated.bemerkung;
-      } catch (error: any) {
-        console.error(
-          "Speicherfehler:",
-          error.response ? error.response.data : error
-        );
-      }
-    },
-
-    // Sortier-Button geklickt
-    sortBy(column: "name" | "klasse" | "fach") {
-      if (this.sortColumn === column) {
-        // Richtung toggeln
-        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      if (student.selectedColor === null) {
+        // "Farbe entfernen" => DELETE
+        await axios.delete("/api/ampel", {
+          params: {
+            lessonId: student.lessonId,
+            studentId: student.studentId,
+            teacherId: student.teacherId
+          }
+        });
       } else {
-        this.sortColumn = column;
-        this.sortDirection = "asc";
+        // "Farbe + Bemerkung speichern" => POST
+        try {
+          const body = {
+            lessonId: student.lessonId,
+            studentId: student.studentId,
+            teacherId: student.teacherId,
+            farbe: student.selectedColor,
+            bemerkung: student.note,
+          };
+          const response = await axios.post("/api/teacher-ampel", body);
+          const updated = response.data;
+          student.selectedColor = updated.farbe;
+          student.note = updated.bemerkung;
+        } catch (error: any) {
+          console.error("Speicherfehler:", error.response ? error.response.data : error);
+        }
       }
     },
 
-    // Optional: Gesamtspeicher-Funktion
-    saveAllChanges() {
-      this.students.forEach((student) => {
-        if (student.selectedColor) {
-          this.saveAmpel(student);
+    // Sortierschaltfläche angeklickt
+    sortBy(column: "name" | "klasse" | "fach") {
+      // Wir toggeln die Reihenfolge: null -> asc -> desc -> null ...
+      const current = this.sortOrders[column];
+
+      if (current === null) {
+        // Von null auf 'asc' schalten
+        this.sortOrders[column] = 'asc';
+        // An das ENDE der Prioritätsliste anhängen (damit zuerst nach alten, dann neuem Kriterium sortiert wird)
+        if (!this.sortPriority.includes(column)) {
+          this.sortPriority.push(column);
         }
-      });
-      console.log("Alle Änderungen gespeichert (sofern Farbe vorhanden war).");
+      } else if (current === 'asc') {
+        // Von asc auf desc
+        this.sortOrders[column] = 'desc';
+      } else {
+        // 'desc' -> wieder null (kein Sortieren)
+        this.sortOrders[column] = null;
+        // Aus Priority-Liste entfernen
+        const idx = this.sortPriority.indexOf(column);
+        if (idx >= 0) {
+          this.sortPriority.splice(idx, 1);
+        }
+      }
     },
   },
 });
 </script>
 
 <style scoped>
-/* Wie in deinem Beispiel */
 .maincontainer {
   overflow-y: auto;
   max-height: 100vh;
@@ -482,7 +471,7 @@ p {
   background-color: white;
 }
 
-/* Button-Farben */
+/* Ampel-Buttons */
 .greenbtn {
   background: #009640 !important;
 }
@@ -501,7 +490,7 @@ p {
   min-width: 165.975px !important;
 }
 
-/* Aktive States */
+/* Active states */
 .selectedgreen {
   box-shadow: 0 0 15px 10px #46c02e !important;
   background-color: #005c27 !important;
@@ -543,7 +532,7 @@ p {
   padding: auto !important;
 }
 
-/* Zeilenfärbung */
+/* Zeilenfarben (Highlight) */
 .rowgreen {
   background-color: #009641e2 !important;
 }
@@ -573,6 +562,7 @@ p {
   width: 90%;
 }
 
+/* Beispiel: Floating Action Button, falls gebraucht */
 .fab-container {
   position: fixed;
   bottom: 1.1em;
