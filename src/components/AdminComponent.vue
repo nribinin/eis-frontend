@@ -5,7 +5,7 @@
         <button @click="navigateTo('/admin/database')">Datenbank bearbeiten</button>
       </div>
       <div class="button-box">
-        <button @click="navigateTo('/admin/manageKV')">Klassenvorstand bearbeiten</button>
+        <button @click="navigateTo('/admin/editkv')">Klassenvorstand bearbeiten</button>
       </div>
       <div class="button-box">
         <button @click="navigateTo('/admin/schueler')">Schüler bearbeiten</button>

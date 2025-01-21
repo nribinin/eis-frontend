@@ -1,6 +1,5 @@
 <template>
   <div class="maincontainer">
-    <!-- Filterfeld -->
     <div class="fixed">
       <div class="filter p-2">
         <div class="row">
@@ -33,11 +32,9 @@
     </div>
 
     <div class="tablecontainer">
-      <!-- Schülerliste -->
       <table class="striped">
         <thead class="fixed">
           <tr>
-            <!-- Nachname + Vorname -->
             <th class="col s3">
               <div class="icontext">
                 <i class="material-icons">person</i> Schüler
@@ -49,7 +46,6 @@
               </div>
             </th>
 
-            <!-- Klasse -->
             <th class="col">
               <div class="icontext">
                 <i class="material-icons">class</i> Klasse
@@ -93,12 +89,10 @@
             :key="index"
             :class="rowClass(student.selectedColor)"
           >
-            <!-- Anzeige: Nachname Vorname -->
             <td>{{ student.nname }} {{ student.vname }}</td>
             <td>{{ student.klasse }}</td>
             <td>{{ student.fach }}</td>
             <td>
-              <!-- Ampelbuttons als Toggle -->
               <div class="radio-buttons">
                 <label>
                   <span
@@ -139,7 +133,6 @@
             </td>
 
             <td class="notecol">
-              <!-- Bemerkung Inline Edit -->
               <span v-if="editingIndex === index">
                 <input
                   class="noteinput"
@@ -173,11 +166,11 @@ interface AmpelStudent {
   lessonId: number;
   studentId: number;
   teacherId: number;
-  vname: string;    // Vorname
-  nname: string;    // Nachname
+  vname: string;
+  nname: string;
   klasse: string;
   fach: string;
-  selectedColor: string | null; // "ROT", "GELB", "GRUEN", "SCHWARZ", "GRAU" oder null
+  selectedColor: string | null;
   note: string;
 }
 
@@ -196,15 +189,11 @@ export default defineComponent({
       weisseAmpel: false,
       nichtZustaendig: false,
       searchTerm: "",
-      // Für jede Spalte: asc / desc / null (aus)
       sortOrders: {
         name: null as 'asc' | 'desc' | null,
         klasse: null as 'asc' | 'desc' | null,
         fach: null as 'asc' | 'desc' | null
       },
-      // Reihenfolge der Spalten, die (derzeit) sortiert werden
-      // Die erste Spalte in diesem Array hat die höchste Priorität.
-      // (Falls du umgekehrte Reihenfolge willst, kannst du das im Sortiercode anpassen.)
       sortPriority: [] as string[],
 
       students: [] as AmpelStudent[],
@@ -212,16 +201,12 @@ export default defineComponent({
   },
   computed: {
     sortedAndFilteredStudents(): AmpelStudent[] {
-      // 1) Kopie erstellen
       let filtered = [...this.students];
 
-      // 2) Filter anwenden
       filtered = filtered.filter((student) => {
-        // A) "Nicht Zuständig" = GRAU ausblenden, wenn !nichtZustaendig
         if (student.selectedColor === "GRAU" && !this.nichtZustaendig) {
           return false;
         }
-        // B) Weiße Ampel = nur null oder GRAU
         if (this.weisseAmpel) {
           const isNullOrGrau =
             student.selectedColor === null || student.selectedColor === "GRAU";
@@ -229,7 +214,6 @@ export default defineComponent({
             return false;
           }
         }
-        // C) Suchbegriffe
         if (this.searchTerm.trim().length > 0) {
           const terms = this.searchTerm.toLowerCase().split("/").filter((t) => t.trim());
           const fullName = (student.nname + " " + student.vname).toLowerCase();
@@ -252,11 +236,10 @@ export default defineComponent({
         return true;
       });
 
-      // 3) Mehrfach-Sortierung
       filtered.sort((a, b) => {
         for (const col of this.sortPriority) {
           const order = this.sortOrders[col as keyof typeof this.sortOrders];
-          if (!order) continue; // Falls zwischendurch null sein sollte
+          if (!order) continue;
           let cmp = 0;
 
           if (col === "name") {
@@ -284,7 +267,6 @@ export default defineComponent({
     try {
       const response = await axios.get("/api/teacher-ampel/getLehrer");
       const data = response.data;
-      // Backend -> Frontend Mapping
       this.students = data.map((ampel: any) => {
         return {
           lessonId: ampel.lessonId,
@@ -319,7 +301,6 @@ export default defineComponent({
     },
 
     toggleColor(student: AmpelStudent, color: string) {
-      // Gleiche Farbe erneut -> entfernen
       if (student.selectedColor === color) {
         student.selectedColor = null;
         this.saveAmpel(student);
@@ -343,7 +324,6 @@ export default defineComponent({
 
     async saveAmpel(student: AmpelStudent) {
       if (student.selectedColor === null) {
-        // "Farbe entfernen" => DELETE
         await axios.delete("/api/ampel", {
           params: {
             lessonId: student.lessonId,
@@ -352,7 +332,6 @@ export default defineComponent({
           }
         });
       } else {
-        // "Farbe + Bemerkung speichern" => POST
         try {
           const body = {
             lessonId: student.lessonId,
@@ -371,25 +350,18 @@ export default defineComponent({
       }
     },
 
-    // Sortierschaltfläche angeklickt
     sortBy(column: "name" | "klasse" | "fach") {
-      // Wir toggeln die Reihenfolge: null -> asc -> desc -> null ...
       const current = this.sortOrders[column];
 
       if (current === null) {
-        // Von null auf 'asc' schalten
         this.sortOrders[column] = 'asc';
-        // An das ENDE der Prioritätsliste anhängen (damit zuerst nach alten, dann neuem Kriterium sortiert wird)
         if (!this.sortPriority.includes(column)) {
           this.sortPriority.push(column);
         }
       } else if (current === 'asc') {
-        // Von asc auf desc
         this.sortOrders[column] = 'desc';
       } else {
-        // 'desc' -> wieder null (kein Sortieren)
         this.sortOrders[column] = null;
-        // Aus Priority-Liste entfernen
         const idx = this.sortPriority.indexOf(column);
         if (idx >= 0) {
           this.sortPriority.splice(idx, 1);

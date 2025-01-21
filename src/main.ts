@@ -19,7 +19,7 @@ app.use(router)
 const snackbar = useSnackbarStore()
 
 const port = 8080
-axios.defaults.baseURL = "http://10.0.106.127:" + port
+axios.defaults.baseURL = "http://localhost:" + port
 axios.defaults.withCredentials = true
 axios.defaults.withXSRFToken = true
 axios.defaults.xsrfCookieName = "XSRF-TOKEN"
@@ -36,6 +36,9 @@ axios.interceptors.response.use(null, (error) => {
   }
   if (error.response.status == 403) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.")
+  }
+  if (error.response.status == 500 && error.response.data === "Bad credentials") {
+    snackbar.push("Benutzername oder Passwort falsch.")
   }
   return Promise.reject(error)
 })

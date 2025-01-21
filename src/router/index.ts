@@ -51,7 +51,12 @@ const router = createRouter({
       path: "/admin/database",
       name: "database",
       component: () => import("@/views/AdminSokratesView.vue"),
-    }
+    },
+    {
+      path: "/admin/editkv",
+      name: "editkv",
+      component: () => import("@/views/AdminEditKVView.vue"),
+    },
   ],
 })
 

@@ -20,7 +20,7 @@ function snackbarTimeout(open: boolean): void {
     {{ snackbar.current?.message ?? "" }}
 
     <template v-slot:actions>
-      <v-btn v-if="snackbar.current?.closeable ?? true" icon="mdi-close" @click="snackbar.close">
+      <v-btn v-if="snackbar.current?.closeable ?? true" @click="snackbar.close" color="red">Schließen
       </v-btn>
     </template>
   </v-snackbar>

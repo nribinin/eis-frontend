@@ -34,7 +34,6 @@
       const modalMessage = ref('');
       const action = ref<() => void>(() => {});
   
-      // Initialisiere Materialize-Modals
       onMounted(() => {
         const modalElement = document.getElementById('confirmation-modal');
         if (modalElement) {

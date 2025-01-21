@@ -32,11 +32,9 @@ async function logout() {
     if (success) {
       await router.push("/");
     } else {
-      // Optional: Fehlerbehandlung, falls Logout nicht erfolgreich ist
       console.error("Logout fehlgeschlagen");
     }
   } catch (error) {
-    // Optional: Fehlerbehandlung für unerwartete Fehler
     console.error("Ein Fehler ist beim Logout aufgetreten:", error);
   }
 }

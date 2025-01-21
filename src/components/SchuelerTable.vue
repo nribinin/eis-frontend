@@ -22,13 +22,10 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Mehrere Datensätze pro Fach -->
           <template v-for="(group, index) in groupedSubjectList" :key="index">
-            <!-- Gruppenzeile -->
             <tr v-if="group.length > 1" :class="getGroupRowClass(group)">
               <td>
                 {{ group[0].subjectLangbezeichnung }}
-                <!-- Icons für Auf-/Zuklappen -->
                 <img
                   v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
                   src="../assets/arrowDown_White.png"
@@ -64,7 +61,6 @@
               </td>
               <td colspan="3"></td>
             </tr>
-            <!-- Ausklappen -->
             <template v-if="expandedGroups.includes(index)">
               <tr
                 v-for="subject in group"
@@ -85,7 +81,6 @@
             </template>
           </template>
 
-          <!-- Einzelne Fächer ohne Doppel-Einträge -->
           <tr
             v-for="subject in singleSubjectList"
             :key="subject.ampelId"
@@ -126,7 +121,6 @@ interface Subject {
 const subjectList = ref<Subject[]>([]);
 const expandedGroups = ref<number[]>([]);
 
-// 1) Laden der Daten
 const fetchSubjects = async () => {
   try {
     const response = await axios.get('/api/student-ampel/getSchueler');
@@ -136,14 +130,11 @@ const fetchSubjects = async () => {
   }
 };
 
-// 2) Computed, das ALLE GRAU-Einträge herausfiltert
 const filteredSubjects = computed(() => {
   return subjectList.value.filter(subject => subject.farbe !== 'GRAU');
 });
 
-// 3) Gruppierung der Datensätze, die nach subjectLangbezeichnung zusammengehören
 const groupedSubjectList = computed(() => {
-  // Wir arbeiten nur mit den gefilterten Datensätzen
   const grouped = filteredSubjects.value.reduce((acc: Subject[][], subject) => {
     const group = acc.find(
       (g) => g[0].subjectLangbezeichnung === subject.subjectLangbezeichnung
@@ -156,24 +147,18 @@ const groupedSubjectList = computed(() => {
     return acc;
   }, []);
 
-  // Nur Gruppen, die mehr als 1 Eintrag haben
   return grouped.filter((group) => group.length > 1);
 });
 
-// 4) Einzelne Fächer, die nur 1 Eintrag haben
 const singleSubjectList = computed(() => {
-  // Für alle gruppierten Einträge
   const groupedSubjects = groupedSubjectList.value
     .flat()
     .map((entry) => entry.subjectLangbezeichnung);
-
-  // Alles, was nicht in groupedSubjects enthalten ist
   return filteredSubjects.value.filter(
     (subject) => !groupedSubjects.includes(subject.subjectLangbezeichnung)
   );
 });
 
-// -- UI-Funktionen
 const toggleGroup = (index: number) => {
   if (expandedGroups.value.includes(index)) {
     expandedGroups.value = expandedGroups.value.filter((i) => i !== index);
@@ -211,7 +196,6 @@ const formatDate = (dateString: string | null) => {
   return format(new Date(dateString), 'dd.MM.yyyy HH:mm');
 };
 
-// Daten holen beim Mounten
 onMounted(fetchSubjects);
 </script>
 

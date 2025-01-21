@@ -14,9 +14,15 @@
                           <li @click="toKV" class="selectSite hoveOnKV choose">
                              KV-Ansicht
                           </li>
+                          <div class="logout right">
+                    <div class="material-icons" @click="logout">exit_to_app</div>
+                  </div>
                       </div>
+                      
                   </ul>
-              </nav>
+                  
+              </nav> 
+              
           </div>
           <Legende />
       </div>
@@ -29,12 +35,21 @@
 <script lang="ts" setup>
 import Teacher from '@/components/TeacherComponent.vue';
 import Legende from '@/components/TeacherHeader.vue';
-
+import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
 import { useRouter } from "vue-router"
 const router = useRouter();
+const authenticationStore = useAuthenticationStore()
+
 
 async function toKV() {
     router.push("/lehrer/kv");
+}
+
+async function logout() {
+  const success = await authenticationStore.logout();
+  if (success) {
+    router.push("/");
+  }
 }
 
 </script>
@@ -109,6 +124,14 @@ h3 {
       }
 
 .selectSite{
+  cursor: pointer;
+}
+.logout {
+  margin-right: 1em;
+  margin-left: 10px;
+  margin-top: 6px;
+}
+.logout:hover {
   cursor: pointer;
 }
 </style>

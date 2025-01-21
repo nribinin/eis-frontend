@@ -6,6 +6,7 @@ export type Authentication = {
   keyHash: number
   credentials: string
   name: string
+  data: string
 }
 
 export type Authority = {

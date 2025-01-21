@@ -5,14 +5,15 @@ import type { LoginRequest } from "@/types/LoginRequest.ts"
 import type { Authentication } from "@/types/Authentication.ts"
 import { Roles } from "@/enum/Roles.ts"
 import type { RouteLocationResolvedGeneric } from "vue-router"
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+
 
 export const useAuthenticationStore = defineStore("authentication", () => {
   const loggedIn = ref(false)
   const role = ref<Roles | null>(null)
-  const displayName = ref<string | null>(null); // Neuer Zustand
+  const displayName = ref<string | null>(null);
+  const snackbar = useSnackbarStore()
 
-
-  //const doubleCount = computed(() => count.value * 2)
   async function login(loginRequest: LoginRequest): Promise<boolean> {
     const response = await axios.post<Authentication, AxiosResponse<Authentication>, LoginRequest>(
       "/auth/login",
@@ -22,7 +23,6 @@ export const useAuthenticationStore = defineStore("authentication", () => {
       setAuthentication(response.data)
       return true
     }
-    console.log(response)
     return false
   }
 

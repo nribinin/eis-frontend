@@ -76,10 +76,6 @@ export default {
     z-index: 1000;
 }
 
-body {
-    overflow-y: hidden;
-    height: auto;
-}
 
 nav ul {
     display: flex;
