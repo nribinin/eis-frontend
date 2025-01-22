@@ -30,6 +30,7 @@ const router = useRouter()
 const form = ref<LoginRequest>({
   username: "nribinin",
   password: "",
+  simulate: true
 })
 
 async function login() {
