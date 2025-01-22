@@ -1,10 +1,11 @@
 <template>
     <div class="container">
+      <h4>BEACHTE! Ist die Datenbank bereits mit Daten befüllt und du versucht Daten hochzuladen, dann könntest du Probleme verursachen!</h4>
       <div class="file-input">
-        <input type="file" id="file" accept=".csv" @change="onFileSelected" />
-        <label for="file" class="btn">Choose CSV File</label>
-        <button class="btn green" :disabled="!selectedFile" @click="openModal('upload')">Upload CSV</button>
-        <button class="btn red" @click="openModal('delete')">Delete CSV</button>
+        <input type="file" id="file" accept=".csv" @change="onFileSelected" hidden/>
+        <label for="file" class="btn">Sokrates Datei auswählen</label>
+        <button class="btn green" :disabled="!selectedFile" @click="openModal('upload')">Datenbank befüllen</button>
+        <button class="btn red" @click="openModal('delete')">Datenbank leeren</button>
       </div>
   
       <!-- Modal für Bestätigungen -->

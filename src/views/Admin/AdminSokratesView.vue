@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import { useAuthenticationStore } from "@/stores/AuthenticationStore";
 import { useRouter } from "vue-router";
-import EditDatabase from '@/components/Admin/EditDatabase.vue';
+import EditDatabase from '@/components/Admin/AdminEditDatabase.vue';
 const authenticationStore = useAuthenticationStore();
 const router = useRouter();
 const title = "Datenbank bearbeiten";

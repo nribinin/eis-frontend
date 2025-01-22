@@ -281,6 +281,10 @@ export default defineComponent({
         } as AmpelStudent;
       });
     } catch (error: any) {
+      if(error.status === 404){
+        console.log("Es ist ein Fehler aufgetreten. Bitte melde dich beim Systemadministrator.");
+        return;
+      }
       console.error("Fehler beim Laden der Ampeldaten:", error?.response?.data || error.message);
     }
   },

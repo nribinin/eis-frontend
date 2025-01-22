@@ -2,16 +2,21 @@
     <div>
       
       <div class="button-box">
+        <p> Datenbank kann mit Sokrates CSV Datein gelehrt bzw. befüllt werden.</p>
         <button @click="navigateTo('/admin/database')">Datenbank bearbeiten</button>
       </div>
       <div class="button-box">
+        <p>Klassenvorstand einer Klasse ändern bzw. hinzufügen (wie es bei der 5. Klasse der Fall ist)</p>
         <button @click="navigateTo('/admin/editkv')">Klassenvorstand bearbeiten</button>
       </div>
       <div class="button-box">
+        <p>Alle Schüler werden hier angezeigt, welche gefiltert und gelöscht werden können. Gleichzeitig kann auch ein neuer Schüler angelegt werden.</p>
         <button @click="navigateTo('/admin/editStudents')">Schüler bearbeiten</button>
       </div>
       <div class="button-box">
-        <button @click="navigateTo('/admin/lehrer')">Lehrer bearbeiten</button>
+        <p>Alle Lehrer werden hier angezeigt, welche gefiltert und gelöscht werden können. Gleichzeitig kann auch ein neuer Lehrer angelegt werden. </p>
+        <p>Beachte: Das Erstellen eines neuen Lehrers funktioniert noch nicht wie erwartet</p>
+        <button @click="navigateTo('/admin/editTeachers')">Lehrer bearbeiten</button>
       </div>
     </div>
   </template>
