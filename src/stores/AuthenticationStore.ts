@@ -9,6 +9,7 @@ import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
 
 
 export const useAuthenticationStore = defineStore("authentication", () => {
+  const loaded = ref(false)
   const loggedIn = ref(false)
   const role = ref<Roles | null>(null)
   const displayName = ref<string | null>(null);
@@ -38,6 +39,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
   function setAuthentication(data: Authentication) {
     const authorities = data.authorities.map((value) => value.authority)
+    console.log("authorities", authorities)
     displayName.value = data.details.displayName
     if (authorities.includes("ROLE_LEHRER")) {
       loggedIn.value = true
@@ -49,6 +51,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
       loggedIn.value = false
       role.value = null
     }
+    loaded.value = true
   }
 
   function isRouteVisible(route: RouteLocationResolvedGeneric): boolean {
@@ -66,21 +69,14 @@ export const useAuthenticationStore = defineStore("authentication", () => {
   }
 
   async function checkLoggedIn() {
-    axios
-      .get<Authentication>("/")
-      .then((response) => {
-        console.log("checkLoggedIn returned with ok ", response)
-        if (response.status == 200) {
-          setAuthentication(response.data)
-        }
-        console.log(response)
-      })
-      .catch((err) => {
-        console.log("checkLoggedIn returned with error ", err)
-      })
+    axios.get<Authentication>("/auth").then((response) => {
+      if (response.status == 200) {
+        setAuthentication(response.data)
+      }
+    })
   }
 
   void checkLoggedIn()
 
-  return { loggedIn, login, logout, role, isRouteVisible, displayName }
+  return {loaded, loggedIn, login, logout, role, isRouteVisible, displayName }
 })
