@@ -1,49 +1,63 @@
 <template>
   <div class="maincontainer">
-      <div class="fixed headcontainer">
-          <div class="header">
-              <nav>
-                  <ul>
-                      <li>
-                          <h3>Ampeleintragung</h3>
-                      </li>
-                      <div>
-                          <li class="selectSite hoveOnKV choose" @click="toTeacher" >
-                            Ampeleintragung
-                          </li>
-                          <li class="selectedSite choose  ">
-                             KV-Ansicht
-                          </li>
-                      </div>
-                  </ul>
-              </nav>
-          </div>
-          <Legende />
+    <div class="fixed headcontainer">
+      <div class="header">
+        <nav>
+          <ul>
+            <li>
+              <h3>Ampeleintragung</h3>
+            </li>
+            <div>
+              <li class="selectSite hoveOnKV choose" @click="toTeacher">
+                Ampeleintragung
+              </li>
+              <li class="selectedSite choose">KV-Ansicht</li>
+              <div class="logout right">
+                <div class="material-icons" @click="logout">exit_to_app</div>
+              </div>
+            </div>
+          </ul>
+        </nav>
       </div>
+    </div>
 
-      <KV/>
-
+    <KV />
   </div>
 </template>
 
 <script lang="ts" setup>
-import KV from '@/components/Teacher/KVComponent.vue';
-import Legende from '@/components/Teacher/TeacherHeader.vue';
+import KV from "@/components/Teacher/KVComponent.vue";
+import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts";
+import { useRouter } from "vue-router";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
-import { useRouter } from "vue-router"
+const snackbar = useSnackbarStore();
+
 const router = useRouter();
+const authenticationStore = useAuthenticationStore();
 
 async function toTeacher() {
-    router.push("/lehrer");
+  router.push("/lehrer");
 }
-
+async function logout() {
+  try {
+    const success = await authenticationStore.logout();
+    if (success) {
+      await router.push("/");
+    } else {
+      snackbar.push("Logout fehlgeschlagen.");
+    }
+  } catch (error) {
+    snackbar.push("Logout fehlgeschlagen: " + error);
+  }
+}
 </script>
 
 <style scoped>
-.icontext{
+.icontext {
   display: flex !important;
   align-items: center !important;
-  flex-direction:initial ;
+  flex-direction: initial;
 }
 .maincontainer {
   overflow-y: auto;
@@ -96,19 +110,27 @@ h3 {
   padding-left: 10px;
 }
 
-@media screen and (max-width: 900px) {
-          h3 {
-              font-size: 1em !important;
-          }
-          nav{
-              height: 10vh !important;
-          }
-          ul{
-              height: 10vh !important;
-          }
-      }
-
-.selectSite{
+.selectSite {
   cursor: pointer;
+}
+.logout {
+  margin-right: 1em;
+  margin-left: 10px;
+  margin-top: 6px;
+}
+.logout:hover {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 900px) {
+  h3 {
+    font-size: 1em !important;
+  }
+  nav {
+    height: 10vh !important;
+  }
+  ul {
+    height: 10vh !important;
+  }
 }
 </style>

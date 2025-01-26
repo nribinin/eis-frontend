@@ -37,13 +37,6 @@
             Lehrer anlegen
           </button>
         </form>
-        <!-- Erfolg / Fehler Meldungen -->
-        <div v-if="createTeacherSuccess" class="status-message success">
-          {{ createTeacherSuccess }}
-        </div>
-        <div v-if="createTeacherError" class="status-message error">
-          {{ createTeacherError }}
-        </div>
       </div>
   
       <!-- Suchfeld für Lehrer -->
@@ -85,6 +78,9 @@
   <script lang="ts">
   import { defineComponent, ref, computed, onMounted, nextTick } from "vue";
   import axios from "axios";
+  import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+  const snackbar = useSnackbarStore()
+
   declare const M: any;
 
   
@@ -119,10 +115,6 @@
       const newTeacherName = ref("");
       const selectedLessonIds = ref<number[]>([]);
   
-      // Erfolg / Fehler
-      const createTeacherSuccess = ref("");
-      const createTeacherError = ref("");
-  
       // Lessons für die Multi-Select
       const lessons = ref<LessonDto[]>([]);
   
@@ -141,7 +133,7 @@
           const response = await axios.get("/api/admin/getAllTeachers");
           teachers.value = response.data;
         } catch (error) {
-          console.error("Fehler beim Laden der Lehrer:", error);
+          snackbar.push("Fehler beim Laden der Lehrer: " + error);
         }
       }
   
@@ -153,11 +145,10 @@
         try {
           const response = await axios.get("/api/admin/getAllLessons");
           lessons.value = response.data;
-          console.log(lessons.value)
           await nextTick() // Wait for DOM to update
           initializeSelect()
         } catch (error) {
-          console.error("Fehler beim Laden der Lessons:", error);
+          snackbar.push("Fehler beim Laden der Lessons: " + error);
         }
       }
 
@@ -172,8 +163,6 @@
        *  Falls 201 => neu laden; Falls 409 => Lehrer existiert
        */
       async function createTeacher() {
-        createTeacherSuccess.value = "";
-        createTeacherError.value = "";
   
         try {
           const body = {
@@ -188,24 +177,15 @@
           });
   
           if (response.status === 201) {
-            createTeacherSuccess.value = response.data; // z. B. "Neuer Lehrer (ID=...) erfolgreich angelegt."
-            // Felder zurücksetzen
             newTeacherName.value = "";
             selectedLessonIds.value = [];
             // Lehrer neu laden
             await fetchTeachers();
-          } else if (response.status === 409) {
-            createTeacherError.value = "Lehrer existiert bereits!";
           } else {
-            // Falls z. B. 200 zurückkommt
-            createTeacherSuccess.value = response.data;
             await fetchTeachers();
           }
         } catch (error: any) {
-          console.error("Fehler beim Anlegen des Lehrers:", error);
-          createTeacherError.value = error.response
-            ? error.response.data
-            : "Unbekannter Fehler.";
+          snackbar.push("Fehler beim Anlegen des Lehrers: " + error.response.data);
         }
       }
   
@@ -218,7 +198,7 @@
           // Neu laden
           await fetchTeachers();
         } catch (error) {
-          console.error("Fehler beim Löschen des Lehrers:", error);
+          snackbar.push("Fehler beim Löschen des Lehrers: " + error);
         }
       }
   
@@ -240,9 +220,6 @@
         searchTerm,
         newTeacherName,
         selectedLessonIds,
-  
-        createTeacherSuccess,
-        createTeacherError,
         lessons,
   
         // Methods

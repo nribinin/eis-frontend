@@ -55,10 +55,6 @@
             </select>
             <label>Lehrer auswählen</label>
           </div>
-  
-          <div v-if="assigning" class="red-text">Speichere...</div>
-          <div v-if="assignSuccess" class="green-text">Erfolgreich zugewiesen!</div>
-          <div v-if="assignError" class="red-text">{{ assignError }}</div>
         </div>
   
         <div class="modal-footer">
@@ -81,6 +77,8 @@
   <script lang="ts" setup>
   import { ref, onMounted, nextTick } from "vue";
   import axios from "axios";
+  import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+  const snackbar = useSnackbarStore()
   
   declare const M: any;
   
@@ -102,15 +100,13 @@
   const selectedTeacherId = ref<number | "">("");
   
   const assigning = ref(false);
-  const assignSuccess = ref(false);
-  const assignError = ref("");
   
   async function fetchClassrooms() {
     try {
       const response = await axios.get("/api/admin/classrooms/with-teachers");
       classrooms.value = response.data;
     } catch (error) {
-      console.error("Fehler beim Laden der Klassen:", error);
+      snackbar.push("Fehler beim Laden der Klassen: " + error);
     }
   }
   
@@ -123,7 +119,7 @@
 
         allTeachers.value = data;
     } catch (error) {
-        console.error("Fehler beim Laden der Lehrer:", error);
+        snackbar.push("Fehler beim Laden der Lehrer: " + error);
     }
    }
   
@@ -131,8 +127,6 @@
     selectedClassroom.value = classroom;
     selectedTeacherId.value = "";
     assigning.value = false;
-    assignSuccess.value = false;
-    assignError.value = "";
   
     nextTick(() => {
       const selectElems = document.querySelectorAll("#modalAssign select");
@@ -150,8 +144,6 @@
     if (!selectedClassroom.value || !selectedTeacherId.value) return;
   
     assigning.value = true;
-    assignSuccess.value = false;
-    assignError.value = "";
   
     try {
       const response = await axios.put("/api/admin/setKlassenvorstand", null, {
@@ -162,14 +154,11 @@
       });
   
       if (response.status === 200) {
-        assignSuccess.value = true;
         await fetchClassrooms();
       }
     } catch (error: any) {
-      assignError.value =
-        error.response?.data?.message || "Fehler bei der Zuweisung.";
-      console.error("Fehler:", error);
-    } finally {
+      snackbar.push("Fehler beim Zuweisen des Klassenvorstands: " + error);
+      } finally {
       assigning.value = false;
     }
   }

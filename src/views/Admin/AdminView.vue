@@ -23,6 +23,8 @@
 import { useAuthenticationStore } from "@/stores/AuthenticationStore";
 import { useRouter } from "vue-router";
 import Admin from '@/components/Admin/AdminComponent.vue';
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+const snackbar = useSnackbarStore()
 const authenticationStore = useAuthenticationStore();
 const router = useRouter();
 const title = "Datenbank bearbeiten";
@@ -32,10 +34,10 @@ async function logout() {
     if (success) {
       await router.push("/");
     } else {
-      console.error("Logout fehlgeschlagen");
+      snackbar.push("Logout fehlgeschlagen.");
     }
   } catch (error) {
-    console.error("Ein Fehler ist beim Logout aufgetreten:", error);
+    snackbar.push("Logout fehlgeschlagen: " + error);
   }
 }
 </script>

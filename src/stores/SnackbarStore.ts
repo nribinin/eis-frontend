@@ -8,10 +8,8 @@ export const useSnackbarStore = defineStore("snackbar", () => {
   //const doubleCount = computed(() => count.value * 2)
   function push(snackbarMessage: SnackbarMessage | string): void {
     if (typeof snackbarMessage === "string") {
-      console.log("Message " + snackbarMessage)
       queue.value.push({ message: snackbarMessage })
     } else {
-      console.log("Message " + snackbarMessage.message)
       queue.value.push(snackbarMessage)
     }
   }

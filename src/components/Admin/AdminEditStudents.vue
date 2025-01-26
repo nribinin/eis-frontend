@@ -26,13 +26,6 @@
         </div>
         <button type="submit" class="btn waves-effect green">Schüler anlegen</button>
       </form>
-      <!-- Erfolg / Fehler Meldungen -->
-      <div v-if="createStudentSuccess" class="status-message success">
-        {{ createStudentSuccess }}
-      </div>
-      <div v-if="createStudentError" class="status-message error">
-        {{ createStudentError }}
-      </div>
     </div>
       <!-- Suchfeld -->
       <div class="search-section">
@@ -75,6 +68,9 @@
   <script lang="ts">
   import { defineComponent, ref, computed, onMounted, nextTick } from "vue";
   import axios from "axios";
+  import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+  const snackbar = useSnackbarStore()
+
   declare const M: any;
 
   interface StudentDto {
@@ -102,10 +98,7 @@
       const newStudentNachname = ref("");
       const newStudentSchuelerkennzahl = ref("");
       const selectedClassroomId = ref<number | "">("");
-  
-      // Erfolg / Fehler
-      const createStudentSuccess = ref("");
-      const createStudentError = ref("");
+
   
       // Liste aller Klassen (zum Auswählen)
       const allClassrooms = ref<ClassroomOption[]>([]);
@@ -127,7 +120,7 @@
           const response = await axios.get("/api/admin/getAllStudents");
           students.value = response.data;
         } catch (error) {
-          console.error("Fehler beim Laden der Schüler:", error);
+          snackbar.push("Fehler beim Laden der Schüler: " + error)
         }
       }
   
@@ -142,7 +135,7 @@
           await nextTick() // Wait for DOM to update
           initializeSelect()
         } catch (error) {
-          console.error("Fehler beim Laden der Klassen:", error);
+          snackbar.push("Fehler beim Laden der Klassen: " + error)
         }
       }
       function initializeSelect() {
@@ -156,8 +149,6 @@
        * -> Body: { vorname, nachname, schuelerkennzahl, classroomId }
        */
       async function createStudent() {
-        createStudentSuccess.value = "";
-        createStudentError.value = "";
   
         try {
           const requestBody = {
@@ -178,12 +169,8 @@
           if (response.status === 201) {           
               window.location.reload();
           }
-          else if(response.status === 409){
-            console.log("Schüler existiert bereits");
-          }
         } catch (error: any) {
-          console.error("Fehler beim Anlegen des Schülers:", error);
-          createStudentError.value = error.response ? error.response.data : "Unbekannter Fehler.";
+          snackbar.push("Fehler beim Anlegen des Schülers: " + error.response.data);
         }
       }
 
@@ -197,7 +184,7 @@
           // Nach dem Löschen: Schülerliste neu laden
           await fetchStudents();
         } catch (error) {
-          console.error("Fehler beim Löschen des Schülers:", error);
+          snackbar.push("Fehler beim Anlegen des Schülers: " + error);
         }
       }
   
@@ -236,9 +223,6 @@
         newStudentNachname,
         newStudentSchuelerkennzahl,
         selectedClassroomId,
-  
-        createStudentSuccess,
-        createStudentError,
         allClassrooms,
   
         // Computed

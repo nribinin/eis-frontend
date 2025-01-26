@@ -25,6 +25,8 @@
   import { useRouter } from "vue-router";
   import EditStudents from '@/components/Admin/AdminEditStudents.vue';
   const authenticationStore = useAuthenticationStore();
+  import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+  const snackbar = useSnackbarStore()
   const router = useRouter();
   const title = "Schüler bearbeiten";
   async function logout() {
@@ -33,10 +35,10 @@
       if (success) {
         await router.push("/");
       } else {
-        console.error("Logout fehlgeschlagen");
+        snackbar.push("Logout fehlgeschlagen.");
       }
     } catch (error) {
-      console.error("Ein Fehler ist beim Logout aufgetreten:", error);
+      snackbar.push("Logout fehlgeschlagen: " + error);
     }
   }
   </script>

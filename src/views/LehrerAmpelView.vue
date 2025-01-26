@@ -1,64 +1,65 @@
 <template>
   <div class="maincontainer">
-      <div class="fixed headcontainer">
-          <div class="header">
-              <nav>
-                  <ul>
-                      <li>
-                          <h3>Ampeleintragung</h3>
-                      </li>
-                      <div>
-                          <li class="selectedSite choose">
-                            Ampeleintragung
-                          </li>
-                          <li @click="toKV" class="selectSite hoveOnKV choose">
-                             KV-Ansicht
-                          </li>
-                          <div class="logout right">
-                    <div class="material-icons" @click="logout">exit_to_app</div>
-                  </div>
-                      </div>
-                      
-                  </ul>
-                  
-              </nav> 
-              
-          </div>
-          <Legende />
+    <div class="fixed headcontainer">
+      <div class="header">
+        <nav>
+          <ul>
+            <li>
+              <h3>Ampeleintragung</h3>
+            </li>
+            <div>
+              <li class="selectedSite choose">Ampeleintragung</li>
+              <li @click="toKV" class="selectSite hoveOnKV choose">
+                KV-Ansicht
+              </li>
+              <div class="logout right">
+                <div class="material-icons" @click="logout">exit_to_app</div>
+              </div>
+            </div>
+          </ul>
+        </nav>
       </div>
+      <Legende />
+    </div>
 
-      <Teacher/>
-
+    <Teacher />
   </div>
 </template>
 
 <script lang="ts" setup>
-import Teacher from '@/components/Teacher/TeacherComponent.vue';
-import Legende from '@/components/Teacher/TeacherHeader.vue';
-import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
-import { useRouter } from "vue-router"
-const router = useRouter();
-const authenticationStore = useAuthenticationStore()
+import Teacher from "@/components/Teacher/TeacherComponent.vue";
+import Legende from "@/components/Teacher/TeacherHeader.vue";
+import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts";
+import { useRouter } from "vue-router";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+const snackbar = useSnackbarStore();
 
+const router = useRouter();
+const authenticationStore = useAuthenticationStore();
 
 async function toKV() {
-    router.push("/lehrer/kv");
+  router.push("/lehrer/kv");
 }
 
 async function logout() {
-  const success = await authenticationStore.logout();
-  if (success) {
-    router.push("/");
+  try {
+    const success = await authenticationStore.logout();
+    if (success) {
+      await router.push("/");
+    } else {
+      snackbar.push("Logout fehlgeschlagen.");
+    }
+  } catch (error) {
+    snackbar.push("Logout fehlgeschlagen: " + error);
   }
 }
-
 </script>
 
 <style scoped>
-.icontext{
+.icontext {
   display: flex !important;
   align-items: center !important;
-  flex-direction:initial ;
+  flex-direction: initial;
 }
 .maincontainer {
   overflow-y: auto;
@@ -111,19 +112,7 @@ h3 {
   padding-left: 10px;
 }
 
-@media screen and (max-width: 900px) {
-          h3 {
-              font-size: 1em !important;
-          }
-          nav{
-              height: 10vh !important;
-          }
-          ul{
-              height: 10vh !important;
-          }
-      }
-
-.selectSite{
+.selectSite {
   cursor: pointer;
 }
 .logout {
@@ -133,5 +122,17 @@ h3 {
 }
 .logout:hover {
   cursor: pointer;
+}
+
+@media screen and (max-width: 900px) {
+  h3 {
+    font-size: 1em !important;
+  }
+  nav {
+    height: 10vh !important;
+  }
+  ul {
+    height: 10vh !important;
+  }
 }
 </style>

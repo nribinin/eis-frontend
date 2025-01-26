@@ -6,27 +6,32 @@
       </h3>
     </div>
     <div class="selectedSite:hover logout right">
-    <div class="material-icons" @click="logout">exit_to_app</div>
+      <div class="material-icons" @click="logout">exit_to_app</div>
     </div>
   </nav>
 </template>
 <script lang="ts" setup>
-import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
-import { useRouter } from "vue-router"
-const router = useRouter()
-const authenticationStore = useAuthenticationStore()
+import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts";
+import { useRouter } from "vue-router";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+const snackbar = useSnackbarStore();
+const router = useRouter();
+const authenticationStore = useAuthenticationStore();
 
 async function logout() {
-  const success = await authenticationStore.logout();
-  if (success) {
-    router.push("/");
+  try {
+    const success = await authenticationStore.logout();
+    if (success) {
+      await router.push("/");
+    } else {
+      snackbar.push("Logout fehlgeschlagen.");
+    }
+  } catch (error) {
+    snackbar.push("Logout fehlgeschlagen");
   }
 }
 
 const title = authenticationStore.displayName;
-console.log(title);
-
-
 </script>
 <style scoped>
 .selectedSite:hover {

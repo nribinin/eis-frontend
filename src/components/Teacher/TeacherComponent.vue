@@ -161,6 +161,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+const snackbar = useSnackbarStore()
 
 interface AmpelStudent {
   lessonId: number;
@@ -281,11 +283,7 @@ export default defineComponent({
         } as AmpelStudent;
       });
     } catch (error: any) {
-      if(error.status === 404){
-        console.log("Es ist ein Fehler aufgetreten. Bitte melde dich beim Systemadministrator.");
-        return;
-      }
-      console.error("Fehler beim Laden der Ampeldaten:", error?.response?.data || error.message);
+      snackbar.push("Fehler beim Laden der Ampeldaten. Melde dich bitte beim Systemadministrator!");
     }
   },
   methods: {
@@ -317,7 +315,7 @@ export default defineComponent({
     onNoteChange(student: AmpelStudent, index: number) {
       this.editingIndex = -1;
       if (!student.selectedColor) {
-        console.log("Keine Ampelfarbe gesetzt, Bemerkung kann nicht gespeichert werden.");
+        snackbar.push("Keine Ampelfarbe ausgewählt. Bitte wähle zuerst eine Farbe aus, dann eine Bemerkung.");
         return;
       }
       if (!student.note || student.note.trim().length === 0) {
@@ -349,7 +347,7 @@ export default defineComponent({
           student.selectedColor = updated.farbe;
           student.note = updated.bemerkung;
         } catch (error: any) {
-          console.error("Speicherfehler:", error.response ? error.response.data : error);
+          snackbar.push("Fehler beim Speichern der Ampel. Melde dich bitte beim Systemadministrator!");
         }
       }
     },

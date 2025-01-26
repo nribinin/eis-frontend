@@ -26,6 +26,9 @@
   import { defineComponent, ref, onMounted } from 'vue';
   import axios from 'axios';
   import M from 'materialize-css';
+  import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+  const snackbar = useSnackbarStore()
+
   
   export default defineComponent({
     name: 'CsvUploader',
@@ -49,7 +52,7 @@
           if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
             selectedFile.value = file;
           } else {
-            M.toast({ html: 'Only CSV files are allowed.', classes: 'red' });
+            snackbar.push("Nur CSV Dateien sind erlaubt")
             selectedFile.value = null;
           }
         }
@@ -81,12 +84,10 @@
               'Content-Type': 'multipart/form-data',
             },
           });
-          M.toast({ html: 'File uploaded successfully!', classes: 'green' });
-          console.log('Response:', response.data);
+          snackbar.push("Datenbank erfolgreich befüllt")
           selectedFile.value = null;
         } catch (error) {
-          console.error('Error uploading file:', error);
-          M.toast({ html: 'An error occurred while uploading the file.', classes: 'red' });
+          snackbar.push("Es ist ein Fehler aufgetreten"+ error)
         } finally {
           modalInstance.value?.close();
         }
@@ -95,11 +96,9 @@
       const deleteCsv = async () => {
         try {
           const response = await axios.delete('/api/admin/deleteAll');
-          M.toast({ html: 'Database cleared successfully!', classes: 'green' });
-          console.log('Response:', response.data);
+          snackbar.push("Datenbank erfolhrecih geleert")
         } catch (error) {
-          console.error('Error deleting file:', error);
-          M.toast({ html: 'An error occurred while clearing the database.', classes: 'red' });
+          snackbar.push("Es ist ein Fehler aufgetreten"+ error)
         } finally {
           modalInstance.value?.close();
         }

@@ -39,7 +39,6 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
   function setAuthentication(data: Authentication) {
     const authorities = data.authorities.map((value) => value.authority)
-    console.log("authorities", authorities)
     displayName.value = data.details.displayName
     if (authorities.includes("ROLE_LEHRER")) {
       loggedIn.value = true

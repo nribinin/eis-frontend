@@ -101,6 +101,8 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+const snackbar = useSnackbarStore()
 
 interface Subject {
   ampelId: number;
@@ -126,7 +128,7 @@ const fetchSubjects = async () => {
     const response = await axios.get('/api/student-ampel/getSchueler');
     subjectList.value = response.data;
   } catch (error) {
-    console.error('Error fetching subjects:', error);
+    snackbar.push("Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!");
   }
 };
 
