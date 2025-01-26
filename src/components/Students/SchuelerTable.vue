@@ -8,16 +8,24 @@
         <thead class="fixed theader">
           <tr>
             <th class="col">
-              <div class="icontext"><i class="material-icons">school</i>Gegenstand</div>
+              <div class="icontext">
+                <i class="material-icons">school</i>Gegenstand
+              </div>
             </th>
             <th class="col">
-              <div class="icontext"><i class="material-icons">person</i>Lehrer</div>
+              <div class="icontext">
+                <i class="material-icons">person</i>Lehrer
+              </div>
             </th>
             <th class="col">
-              <div class="icontext"><i class="material-icons">insert_invitation</i>Datum</div>
+              <div class="icontext">
+                <i class="material-icons">insert_invitation</i>Datum
+              </div>
             </th>
             <th class="col">
-              <div class="icontext"><i class="material-icons">subject</i>Anmerkung</div>
+              <div class="icontext">
+                <i class="material-icons">subject</i>Anmerkung
+              </div>
             </th>
           </tr>
         </thead>
@@ -27,7 +35,10 @@
               <td>
                 {{ group[0].subjectLangbezeichnung }}
                 <img
-                  v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
+                  v-if="
+                    getGroupRowClass(group) === 'rowblack' &&
+                    !expandedGroups.includes(index)
+                  "
                   src="@/assets/arrowDown_White.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
@@ -35,7 +46,10 @@
                   style="cursor: pointer"
                 />
                 <img
-                  v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
+                  v-if="
+                    getGroupRowClass(group) === 'rowblack' &&
+                    expandedGroups.includes(index)
+                  "
                   src="@/assets/arrowUp_White.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
@@ -98,11 +112,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
-import { format } from 'date-fns';
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
-const snackbar = useSnackbarStore()
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
+import { format } from "date-fns";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+const snackbar = useSnackbarStore();
 
 interface Subject {
   ampelId: number;
@@ -125,15 +139,17 @@ const expandedGroups = ref<number[]>([]);
 
 const fetchSubjects = async () => {
   try {
-    const response = await axios.get('/api/student-ampel/getSchueler');
+    const response = await axios.get("/student-ampel/getSchueler");
     subjectList.value = response.data;
   } catch (error) {
-    snackbar.push("Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!");
+    snackbar.push(
+      "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
+    );
   }
 };
 
 const filteredSubjects = computed(() => {
-  return subjectList.value.filter(subject => subject.farbe !== 'GRAU');
+  return subjectList.value.filter((subject) => subject.farbe !== "GRAU");
 });
 
 const groupedSubjectList = computed(() => {
@@ -171,31 +187,31 @@ const toggleGroup = (index: number) => {
 
 const getRowClass = (subject: Subject) => {
   switch (subject.farbe) {
-    case 'GRUEN':
-      return 'rowgreen';
-    case 'GELB':
-      return 'rowyellow';
-    case 'ROT':
-      return 'rowred';
-    case 'SCHWARZ':
-      return 'rowblack';
+    case "GRUEN":
+      return "rowgreen";
+    case "GELB":
+      return "rowyellow";
+    case "ROT":
+      return "rowred";
+    case "SCHWARZ":
+      return "rowblack";
     default:
-      return '';
+      return "";
   }
 };
 
 const getGroupRowClass = (group: Subject[]) => {
   const colors = group.map((item) => item.farbe);
-  if (colors.includes('SCHWARZ')) return 'rowblack';
-  if (colors.includes('ROT')) return 'rowred';
-  if (colors.includes('GELB')) return 'rowyellow';
-  if (colors.includes('GRUEN')) return 'rowgreen';
-  return '';
+  if (colors.includes("SCHWARZ")) return "rowblack";
+  if (colors.includes("ROT")) return "rowred";
+  if (colors.includes("GELB")) return "rowyellow";
+  if (colors.includes("GRUEN")) return "rowgreen";
+  return "";
 };
 
 const formatDate = (dateString: string | null) => {
   if (!dateString) return null;
-  return format(new Date(dateString), 'dd.MM.yyyy HH:mm');
+  return format(new Date(dateString), "dd.MM.yyyy HH:mm");
 };
 
 onMounted(fetchSubjects);

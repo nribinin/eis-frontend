@@ -97,37 +97,50 @@
                 <label>
                   <span
                     class="btn greenbtn"
-                    :class="{ selectedgreen: student.selectedColor === 'GRUEN' }"
+                    :class="{
+                      selectedgreen: student.selectedColor === 'GRUEN',
+                    }"
                     @click="toggleColor(student, 'GRUEN')"
-                  >Grün</span>
+                    >Grün</span
+                  >
                 </label>
                 <label>
                   <span
                     class="btn yellowbtn"
-                    :class="{ selectedyellow: student.selectedColor === 'GELB' }"
+                    :class="{
+                      selectedyellow: student.selectedColor === 'GELB',
+                    }"
                     @click="toggleColor(student, 'GELB')"
-                  >Gelb</span>
+                    >Gelb</span
+                  >
                 </label>
                 <label>
                   <span
                     class="btn redbtn"
                     :class="{ selectedred: student.selectedColor === 'ROT' }"
                     @click="toggleColor(student, 'ROT')"
-                  >Rot</span>
+                    >Rot</span
+                  >
                 </label>
                 <label>
                   <span
                     class="btn black"
-                    :class="{ selectedblack: student.selectedColor === 'SCHWARZ' }"
+                    :class="{
+                      selectedblack: student.selectedColor === 'SCHWARZ',
+                    }"
                     @click="toggleColor(student, 'SCHWARZ')"
-                  >Schwarz</span>
+                    >Schwarz</span
+                  >
                 </label>
                 <label>
                   <span
                     class="btn whitebtn black-text"
-                    :class="{ selectednichtzustaendig: student.selectedColor === 'GRAU' }"
+                    :class="{
+                      selectednichtzustaendig: student.selectedColor === 'GRAU',
+                    }"
                     @click="toggleColor(student, 'GRAU')"
-                  >Nicht Zuständig</span>
+                    >Nicht Zuständig</span
+                  >
                 </label>
               </div>
             </td>
@@ -161,8 +174,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
-const snackbar = useSnackbarStore()
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+const snackbar = useSnackbarStore();
 
 interface AmpelStudent {
   lessonId: number;
@@ -192,9 +205,9 @@ export default defineComponent({
       nichtZustaendig: false,
       searchTerm: "",
       sortOrders: {
-        name: null as 'asc' | 'desc' | null,
-        klasse: null as 'asc' | 'desc' | null,
-        fach: null as 'asc' | 'desc' | null
+        name: null as "asc" | "desc" | null,
+        klasse: null as "asc" | "desc" | null,
+        fach: null as "asc" | "desc" | null,
       },
       sortPriority: [] as string[],
 
@@ -217,11 +230,18 @@ export default defineComponent({
           }
         }
         if (this.searchTerm.trim().length > 0) {
-          const terms = this.searchTerm.toLowerCase().split("/").filter((t) => t.trim());
+          const terms = this.searchTerm
+            .toLowerCase()
+            .split("/")
+            .filter((t) => t.trim());
           const fullName = (student.nname + " " + student.vname).toLowerCase();
-          const fullNameRev = (student.vname + " " + student.nname).toLowerCase();
+          const fullNameRev = (
+            student.vname +
+            " " +
+            student.nname
+          ).toLowerCase();
 
-          const allMatch = terms.every(term => {
+          const allMatch = terms.every((term) => {
             return (
               student.nname.toLowerCase().includes(term) ||
               student.vname.toLowerCase().includes(term) ||
@@ -267,7 +287,7 @@ export default defineComponent({
 
   async created() {
     try {
-      const response = await axios.get("/api/teacher-ampel/getLehrer");
+      const response = await axios.get("/teacher-ampel/getLehrer");
       const data = response.data;
       this.students = data.map((ampel: any) => {
         return {
@@ -283,7 +303,9 @@ export default defineComponent({
         } as AmpelStudent;
       });
     } catch (error: any) {
-      snackbar.push("Fehler beim Laden der Ampeldaten. Melde dich bitte beim Systemadministrator!");
+      snackbar.push(
+        "Fehler beim Laden der Ampeldaten. Melde dich bitte beim Systemadministrator!"
+      );
     }
   },
   methods: {
@@ -315,7 +337,9 @@ export default defineComponent({
     onNoteChange(student: AmpelStudent, index: number) {
       this.editingIndex = -1;
       if (!student.selectedColor) {
-        snackbar.push("Keine Ampelfarbe ausgewählt. Bitte wähle zuerst eine Farbe aus, dann eine Bemerkung.");
+        snackbar.push(
+          "Keine Ampelfarbe ausgewählt. Bitte wähle zuerst eine Farbe aus, dann eine Bemerkung."
+        );
         return;
       }
       if (!student.note || student.note.trim().length === 0) {
@@ -326,12 +350,12 @@ export default defineComponent({
 
     async saveAmpel(student: AmpelStudent) {
       if (student.selectedColor === null) {
-        await axios.delete("/api/ampel", {
+        await axios.delete("/ampel", {
           params: {
             lessonId: student.lessonId,
             studentId: student.studentId,
-            teacherId: student.teacherId
-          }
+            teacherId: student.teacherId,
+          },
         });
       } else {
         try {
@@ -342,12 +366,14 @@ export default defineComponent({
             farbe: student.selectedColor,
             bemerkung: student.note,
           };
-          const response = await axios.post("/api/teacher-ampel", body);
+          const response = await axios.post("/teacher-ampel", body);
           const updated = response.data;
           student.selectedColor = updated.farbe;
           student.note = updated.bemerkung;
         } catch (error: any) {
-          snackbar.push("Fehler beim Speichern der Ampel. Melde dich bitte beim Systemadministrator!");
+          snackbar.push(
+            "Fehler beim Speichern der Ampel. Melde dich bitte beim Systemadministrator!"
+          );
         }
       }
     },
@@ -356,12 +382,12 @@ export default defineComponent({
       const current = this.sortOrders[column];
 
       if (current === null) {
-        this.sortOrders[column] = 'asc';
+        this.sortOrders[column] = "asc";
         if (!this.sortPriority.includes(column)) {
           this.sortPriority.push(column);
         }
-      } else if (current === 'asc') {
-        this.sortOrders[column] = 'desc';
+      } else if (current === "asc") {
+        this.sortOrders[column] = "desc";
       } else {
         this.sortOrders[column] = null;
         const idx = this.sortPriority.indexOf(column);

@@ -5,7 +5,7 @@
         <nav>
           <ul>
             <li>
-              <h3>Ampeleintragung</h3>
+              <h3>Klassenvorstand</h3>
             </li>
             <div>
               <li class="selectSite hoveOnKV choose" @click="toTeacher">
@@ -22,6 +22,7 @@
     </div>
 
     <KV />
+    <br />
   </div>
 </template>
 
@@ -60,7 +61,6 @@ async function logout() {
   flex-direction: initial;
 }
 .maincontainer {
-  overflow-y: auto;
   max-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -74,11 +74,6 @@ async function logout() {
   top: 0;
   width: 100%;
   z-index: 1000;
-}
-
-body {
-  overflow-y: hidden;
-  height: auto;
 }
 
 nav ul {
@@ -117,6 +112,7 @@ h3 {
   margin-right: 1em;
   margin-left: 10px;
   margin-top: 6px;
+  margin-bottom: -5.6px;
 }
 .logout:hover {
   cursor: pointer;
