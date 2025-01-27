@@ -88,7 +88,12 @@ onMounted(async () => {
     // Passe den Pfad an deinen tatsächlichen Backend-Mapping an
     // z. B. '/teacher-ampel/kv/getStudents'
     const resp = await axios.get("/teacher-ampel/kv/getStudents");
-
+    if (!resp.data || (Array.isArray(resp.data) && resp.data.length === 0)) {
+      snackbar.push(
+        "Schüler konnten nicht geladen werden. Entweder bist du kein KV einer Klasse oder es gab einen Fehler."
+      );
+      return;
+    }
     // 1) "resp.data" => Array<KvStudentAmpelDto>
     // 2) Sortieren nach studentName
     const sortedData = resp.data.sort(
@@ -107,7 +112,7 @@ onMounted(async () => {
     }));
   } catch (error) {
     snackbar.push(
-      "Schüler konnten nicht geladen werden. Entweder bist du kein KV einer Klasse oder es gab einen Fehler."
+      "Fehler beim Laden der Schüler. Bitte wende dich an den Systemadministrator."
     );
   }
 });
