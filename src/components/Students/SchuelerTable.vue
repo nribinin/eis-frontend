@@ -1,4 +1,3 @@
-<!-- SchuelerTable.vue -->
 <template>
   <div class="schuelerTable">
     <template v-if="subjectList.length === 0">
@@ -32,11 +31,7 @@
         </thead>
         <tbody>
           <template v-for="(group, index) in groupedSubjectList" :key="index">
-            <tr
-              v-if="group.length > 1"
-              :class="getGroupRowClass(group)"
-              class="z-depth-5"
-            >
+            <tr v-if="group.length > 1" :class="getGroupRowClass(group)">
               <td>
                 {{ group[0].subjectLangbezeichnung }}
                 <img
@@ -99,11 +94,11 @@
               </tr>
             </template>
           </template>
+
           <tr
             v-for="subject in singleSubjectList"
             :key="subject.ampelId"
             :class="getRowClass(subject)"
-            class="z-depth-5"
           >
             <td>{{ subject.subjectLangbezeichnung }}</td>
             <td>{{ subject.teacherName }}</td>
@@ -169,6 +164,7 @@ const groupedSubjectList = computed(() => {
     }
     return acc;
   }, []);
+
   return grouped.filter((group) => group.length > 1);
 });
 
@@ -225,6 +221,11 @@ onMounted(fetchSubjects);
 .rowgreen {
   background-color: #009640 !important;
 }
+.icontext {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: initial;
+}
 .rowyellow {
   background-color: #ffc107 !important;
 }
@@ -235,11 +236,6 @@ onMounted(fetchSubjects);
 .rowblack {
   background-color: #000000 !important;
   color: white;
-}
-.icontext {
-  display: flex !important;
-  align-items: center !important;
-  flex-direction: initial;
 }
 .dropdown-icon {
   margin-left: 10px;
@@ -255,26 +251,14 @@ onMounted(fetchSubjects);
   background-color: white;
 }
 .schuelerTable {
-  width: 100%;
-  overflow-x: auto;
-}
-.striped {
-  width: 100%;
-  min-width: 600px;
-  border-collapse: collapse;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 .no-data-message {
   text-align: center;
   font-size: 1.5em;
   margin-top: 2em;
   color: #555;
-}
-@media (max-width: 768px) {
-  .col {
-    font-size: 0.9rem;
-  }
-  .icontext {
-    font-size: 0.9rem;
-  }
 }
 </style>
