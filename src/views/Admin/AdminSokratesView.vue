@@ -1,31 +1,34 @@
 <template>
   <div class="maincontainer">
-      <div class="fixed headcontainer">
-          <div class="header">
-              <nav>
-                  <ul>
-                      <li>
-                          <h3>{{ title }}</h3>
-                      </li>
-                      <div class="selectedSite:hover logout right">
-                        <div class="material-icons" @click="logout">exit_to_app</div>
-                                                    
-                      </div>
-                  </ul>
-              </nav>
-          </div>
-          <EditDatabase />
+    <div class="fixed headcontainer">
+      <div class="header">
+        <nav>
+          <ul>
+            <li>
+              <div class="goBack" @click="goBack">
+                <p>Zurück</p>
+              </div>
+            </li>
+            <li>
+              <h3>{{ title }}</h3>
+            </li>
+            <div class="selectedSite:hover logout right">
+              <div class="material-icons" @click="logout">exit_to_app</div>
+            </div>
+          </ul>
+        </nav>
       </div>
-
+      <EditDatabase />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useAuthenticationStore } from "@/stores/AuthenticationStore";
 import { useRouter } from "vue-router";
-import EditDatabase from '@/components/Admin/AdminEditDatabase.vue';
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
-const snackbar = useSnackbarStore()
+import EditDatabase from "@/components/Admin/AdminEditDatabase.vue";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+const snackbar = useSnackbarStore();
 const authenticationStore = useAuthenticationStore();
 const router = useRouter();
 const title = "Datenbank bearbeiten";
@@ -41,6 +44,9 @@ async function logout() {
     snackbar.push("Logout fehlgeschlagen: " + error);
   }
 }
+async function goBack() {
+  await router.push("/admin");
+}
 </script>
 
 <style scoped>
@@ -54,9 +60,8 @@ async function logout() {
 .header {
   width: 100%;
   padding: 1em 0;
-  background-color: black; 
+  background-color: black;
 }
-
 
 .fixed {
   position: sticky;
@@ -84,7 +89,7 @@ h3 {
   color: white;
 }
 
-nav{
+nav {
   background-color: black;
 }
 
@@ -124,5 +129,9 @@ nav{
 .logout {
   margin-right: 1em;
   cursor: pointer;
+}
+.goBack {
+  cursor: pointer;
+  padding-left: 0.5em;
 }
 </style>
