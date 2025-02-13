@@ -49,7 +49,7 @@
     </div>
 
     <!-- Tabelle der Lehrer -->
-    <table class="styled-table">
+    <table class="highlight responsive-table main-table">
       <thead>
         <tr>
           <th>Name</th>

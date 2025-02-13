@@ -1,105 +1,237 @@
 <template>
-  <div class="student-container">
-    <div class="create-student-section">
-      <h3>Neuen Schüler anlegen</h3>
-      <form @submit.prevent="createStudent" class="new-student-form">
-        <div>
-          <label for="vorname">Vorname:</label>
-          <input
-            type="text"
-            id="vorname"
-            v-model="newStudentVorname"
-            required
-          />
-        </div>
-        <div>
-          <label for="nachname">Nachname:</label>
-          <input
-            type="text"
-            id="nachname"
-            v-model="newStudentNachname"
-            required
-          />
-        </div>
-        <div>
-          <label for="schuelerkennzahl">Schülerkennzahl:</label>
-          <input
-            type="text"
-            id="schuelerkennzahl"
-            v-model="newStudentSchuelerkennzahl"
-            required
-          />
-        </div>
-        <div>
-          <label for="classroom-select">Klasse:</label>
-          <select id="classroom-select" v-model="selectedClassroomId" required>
-            <option disabled value="">Bitte wählen</option>
-            <option v-for="c in allClassrooms" :key="c.id" :value="c.id">
-              {{ c.name }}
-            </option>
-          </select>
-        </div>
-        <button type="submit" class="btn waves-effect green">
-          Schüler anlegen
-        </button>
-      </form>
-    </div>
+  <div class="page-container">
     <!-- Suchfeld -->
-    <div class="search-section">
-      <label for="searchInput">Suchen:</label>
-      <input
-        id="searchInput"
-        type="text"
-        v-model="searchTerm"
-        placeholder="Nachname, Vorname, Kennzahl oder Klasse..."
-      />
+    <div class="row search-row">
+      <div class="input-field col s12 m8 offset-m2">
+        <i class="material-icons prefix">search</i>
+        <input
+          id="searchInput"
+          type="text"
+          v-model="searchTerm"
+        />
+        <label for="searchInput">Schüler suchen</label>
+      </div>
     </div>
 
-    <!-- Tabelle der Schüler -->
-    <table class="styled-table">
-      <thead>
-        <tr>
-          <th>Nachname</th>
-          <th>Vorname</th>
-          <th>Schülerkennzahl</th>
-          <th>Klasse</th>
-          <th>Aktion</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="student in filteredStudents" :key="student.id">
-          <td>{{ student.firstName }}</td>
-          <td>{{ student.lastName }}</td>
-          <td>{{ student.schuelerkennzahl }}</td>
-          <td>{{ student.classroom }}</td>
-          <td>
-            <button
-              class="btn waves-effect red"
-              @click="deleteStudent(student.schuelerkennzahl)"
-            >
-              Löschen
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Button: Neuen Schüler anlegen -->
+    <div class="button-row">
+      <a
+        href="#modalAddStudent"
+        class="waves-effect waves-light btn green modal-trigger add-btn"
+      >
+        Neuen Schüler anlegen
+      </a>
+    </div>
+
+    <!-- Liste der Schüler (statt 'table') -->
+    <div class="students-list">
+      <div
+        v-for="student in filteredStudents"
+        :key="student.id"
+        class="row student-row"
+      >
+        <!-- Jede "Zeile" ein .row, jedes Feld ein .col s12 m2 etc. -->
+        <div class="col s12 m2">
+          <strong>Nachname:</strong> <br /> {{ student.lastName }}
+        </div>
+        <div class="col s12 m2">
+          <strong>Vorname:</strong> <br /> {{ student.firstName }}
+        </div>
+        <div class="col s12 m3">
+          <strong>Schülerkennzahl:</strong> <br /> {{ student.schuelerkennzahl }}
+        </div>
+        <div class="col s12 m2">
+          <strong>Klasse:</strong> <br /> {{ student.classroom }}
+        </div>
+        <div class="col s12 m3">
+          <button
+            class="waves-effect waves-light btn modal-trigger green mr-1"
+            href="#modalEditStudent"
+            @click="openEditModal(student)"
+          >
+            Bearbeiten
+          </button>
+          <button
+            class="waves-effect waves-light btn red"
+            @click="confirmDelete(student)"
+          >
+            Löschen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Neuen Schüler anlegen -->
+    <div id="modalAddStudent" class="modal">
+      <div class="modal-content">
+        <h5>Neuen Schüler anlegen</h5>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input
+              id="vorname"
+              v-model="newStudentVorname"
+              type="text"
+              required
+            />
+            <label for="vorname">Vorname</label>
+          </div>
+          <div class="input-field col s12 m6">
+            <input
+              id="nachname"
+              v-model="newStudentNachname"
+              type="text"
+              required
+            />
+            <label for="nachname">Nachname</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input
+              id="schuelerkennzahl"
+              v-model="newStudentSchuelerkennzahl"
+              type="text"
+              required
+            />
+            <label for="schuelerkennzahl">Schülerkennzahl</label>
+          </div>
+          <div class="input-field col s12 m6 dropdown-area">
+            <select v-model="selectedClassroomId" required>
+              <option disabled value="">Bitte wählen</option>
+              <option
+                v-for="c in allClassrooms"
+                :key="c.id"
+                :value="c.id"
+              >
+                {{ c.name }}
+              </option>
+            </select>
+            <label>Klasse</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a
+          href="#!"
+          class="modal-close waves-effect btn grey mr-1"
+        >
+          Abbrechen
+        </a>
+        <a
+          href="#!"
+          class="modal-close waves-effect btn green btnmodal"
+          @click.prevent="createStudent"
+        >
+          Anlegen
+        </a>
+      </div>
+    </div>
+
+    <!-- Modal: Bearbeiten -->
+    <div id="modalEditStudent" class="modal">
+      <div class="modal-content">
+        <h5>Schüler bearbeiten</h5>
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input
+              id="editVorname"
+              type="text"
+              v-model="editStudentVorname"
+              required
+            />
+            <label for="editVorname" class="active">Vorname</label>
+          </div>
+          <div class="input-field col s12 m6">
+            <input
+              id="editNachname"
+              type="text"
+              v-model="editStudentNachname"
+              required
+            />
+            <label for="editNachname" class="active">Nachname</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="input-field col s12 m6">
+            <input
+              id="editKennzahl"
+              type="text"
+              v-model="editStudentKennzahl"
+              required
+            />
+            <label for="editKennzahl" class="active">Schülerkennzahl</label>
+          </div>
+          <div class="input-field col s12 m6 dropdown-area">
+            <select v-model="editSelectedClassroomId" required>
+              <option disabled value="">Bitte wählen</option>
+              <option
+                v-for="c in allClassrooms"
+                :key="c.id"
+                :value="c.id"
+              >
+                {{ c.name }}
+              </option>
+            </select>
+            <label>Klasse</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a
+          href="#!"
+          class="modal-close waves-effect btn grey btnmodal"
+        >
+          Abbrechen
+        </a>
+        <a
+          href="#!"
+          class="modal-close waves-effect btn green btnmodal"
+          @click.prevent="updateStudent"
+        >
+          Speichern
+        </a>
+      </div>
+    </div>
+
+    <!-- Delete-Modal (eigenes Overlay) -->
+    <div v-if="deleteModalOpen" class="custom-overlay">
+      <div class="custom-modal">
+        <h5>Löschen bestätigen</h5>
+        <p>
+          Bist du sicher, dass du den Schüler
+          <strong>{{ studentToDelete?.lastName }} {{ studentToDelete?.firstName }}</strong>
+          löschen möchtest?
+        </p>
+        <div class="modal-actions">
+          <button class="waves-effect btn grey mr-1" @click="cancelDelete">
+            Abbrechen
+          </button>
+          <button class="waves-effect btn red" @click="deleteStudentNow">
+            Löschen
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, nextTick } from "vue";
+import { defineComponent, ref, onMounted, computed, nextTick } from "vue";
 import axios from "axios";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 
+// Declarations
 declare const M: any;
 
 interface StudentDto {
+  id: number;
   firstName: string;
   lastName: string;
   schuelerkennzahl: string;
-  classroom: string | null; // falls kein Classroom
-  id: number;
+  classroom: string | null;
 }
 
 interface ClassroomOption {
@@ -110,237 +242,288 @@ interface ClassroomOption {
 export default defineComponent({
   name: "KvStudentManagement",
   setup() {
-    // States
-    const students = ref<StudentDto[]>([]);
-    const searchTerm = ref<string>("");
+    const snackbar = useSnackbarStore();
 
-    // Neuer Schüler
+    // State: Schüler
+    const students = ref<StudentDto[]>([]);
+    const searchTerm = ref("");
+
+    // State: Klassen
+    const allClassrooms = ref<ClassroomOption[]>([]);
+
+    // Add Student
     const newStudentVorname = ref("");
     const newStudentNachname = ref("");
     const newStudentSchuelerkennzahl = ref("");
     const selectedClassroomId = ref<number | "">("");
 
-    const allClassrooms = ref<ClassroomOption[]>([]);
+    // Edit Student
+    const editStudentId = ref<number | null>(null);
+    const editStudentVorname = ref("");
+    const editStudentNachname = ref("");
+    const editStudentKennzahl = ref("");
+    const editSelectedClassroomId = ref<number | "">("");
 
-    onMounted(async () => {
-      await fetchStudents();
-      await fetchAllClassrooms();
+    // Delete
+    const deleteModalOpen = ref(false);
+    const studentToDelete = ref<StudentDto | null>(null);
+
+    // Lifecycle
+    onMounted(() => {
+      // Materialize modal init
+      const modalElems = document.querySelectorAll(".modal");
+      M.Modal.init(modalElems);
+
+      fetchStudents();
+      fetchClassrooms();
     });
+
+    // After we fill <select> options, re-init FormSelect
+    function initMaterializeSelects() {
+      const sel = document.querySelectorAll("select");
+      M.FormSelect.init(sel, {
+        dropdownOptions: {
+          container: document.body,
+          constrainWidth: false,
+          coverTrigger: false,
+        },
+      });
+    }
 
     async function fetchStudents() {
       try {
-        const response = await axios.get("/admin/getAllStudents");
-        students.value = response.data;
+        const resp = await axios.get("/admin/getAllStudents");
+        students.value = resp.data;
       } catch (error) {
         snackbar.push("Fehler beim Laden der Schüler: " + error);
       }
     }
-    async function fetchAllClassrooms() {
+
+    async function fetchClassrooms() {
       try {
-        const response = await axios.get("/admin/classrooms");
-        allClassrooms.value = response.data;
-        await nextTick();
-        initializeSelect();
+        const resp = await axios.get("/admin/classrooms");
+        allClassrooms.value = resp.data;
+        nextTick(() => initMaterializeSelects());
       } catch (error) {
         snackbar.push("Fehler beim Laden der Klassen: " + error);
       }
     }
-    function initializeSelect() {
-      const elems = document.querySelectorAll("select");
-      M.FormSelect.init(elems);
-    }
 
+    // CREATE
     async function createStudent() {
       try {
-        const requestBody = {
+        const body = {
           vorname: newStudentVorname.value,
           nachname: newStudentNachname.value,
           schuelerkennzahl: newStudentSchuelerkennzahl.value,
           classroomId: selectedClassroomId.value,
         };
+        const resp = await axios.post("/admin/newStudent", body);
+        if (resp.status === 200 || resp.status === 201) {
+          snackbar.push("Schüler erfolgreich angelegt!");
+          // Reset
+          newStudentVorname.value = "";
+          newStudentNachname.value = "";
+          newStudentSchuelerkennzahl.value = "";
+          selectedClassroomId.value = "";
+          fetchStudents();
+        }
+      } catch (error: any) {
+        snackbar.push("Fehler beim Anlegen: " + (error.response?.data ?? error));
+      }
+    }
 
-        const response = await axios.post("/admin/newStudent", requestBody, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.status === 201) {
-          window.location.reload();
+    // EDIT
+    function openEditModal(student: StudentDto) {
+      editStudentId.value = student.id;
+      editStudentVorname.value = student.firstName;
+      editStudentNachname.value = student.lastName;
+      editStudentKennzahl.value = student.schuelerkennzahl;
+      const matched = allClassrooms.value.find(
+        (c) => c.name === student.classroom
+      );
+      editSelectedClassroomId.value = matched ? matched.id : "";
+
+      nextTick(() => initMaterializeSelects());
+    }
+
+    async function updateStudent() {
+      if (!editStudentId.value) return;
+      try {
+        const body = {
+          id: editStudentId.value,
+          vorname: editStudentVorname.value,
+          nachname: editStudentNachname.value,
+          schuelerkennzahl: editStudentKennzahl.value,
+          classroomId: editSelectedClassroomId.value,
+        };
+        const resp = await axios.put("/admin/updateStudent", body);
+        if (resp.status === 200) {
+          snackbar.push("Schüler aktualisiert!");
+          fetchStudents();
         }
       } catch (error: any) {
         snackbar.push(
-          "Fehler beim Anlegen des Schülers: " + error.response.data
+          "Fehler beim Aktualisieren: " + (error.response?.data ?? error)
         );
       }
     }
 
-    async function deleteStudent(studentSchuelerkennzahl: string) {
+    // DELETE
+    function confirmDelete(student: StudentDto) {
+      studentToDelete.value = student;
+      deleteModalOpen.value = true;
+    }
+    function cancelDelete() {
+      deleteModalOpen.value = false;
+      studentToDelete.value = null;
+    }
+    async function deleteStudentNow() {
+      if (!studentToDelete.value) return;
       try {
-        // Aufruf mit passender URL (Pfad anpassen, falls du Param schickst)
-        await axios.delete(`/admin/deleteStudent/${studentSchuelerkennzahl}`, {
-          // falls du CSRF oder mitCredentials brauchst, setze es hier
-        });
-
-        // Nach dem Löschen: Schülerliste neu laden
-        await fetchStudents();
+        await axios.delete(
+          `/admin/deleteStudent/${studentToDelete.value.schuelerkennzahl}`
+        );
+        snackbar.push("Schüler erfolgreich gelöscht.");
+        deleteModalOpen.value = false;
+        studentToDelete.value = null;
+        fetchStudents();
       } catch (error) {
-        snackbar.push("Fehler beim Anlegen des Schülers: " + error);
+        snackbar.push("Fehler beim Löschen: " + error);
       }
     }
 
-    /**
-     * Computed: Filtert die Schülerliste basierend auf searchTerm
-     */
+    // Filter: nur by name, kennzahl, class
     const filteredStudents = computed(() => {
-      if (!searchTerm.value.trim()) {
-        return students.value;
-      }
-
+      if (!searchTerm.value.trim()) return students.value;
       const lower = searchTerm.value.toLowerCase();
-
-      return students.value.filter((student) => {
-        const fullName = (
-          student.lastName +
-          " " +
-          student.firstName
-        ).toLowerCase();
-        const reverseName = (
-          student.firstName +
-          " " +
-          student.lastName
-        ).toLowerCase();
-        const klassenzimmer = student.classroom
-          ? student.classroom.toLowerCase()
-          : "";
-
+      return students.value.filter((st) => {
+        const fullName = (st.lastName + " " + st.firstName).toLowerCase();
+        const revName = (st.firstName + " " + st.lastName).toLowerCase();
+        const kl = st.classroom ? st.classroom.toLowerCase() : "";
         return (
-          student.lastName.toLowerCase().includes(lower) ||
-          student.firstName.toLowerCase().includes(lower) ||
-          student.schuelerkennzahl.toLowerCase().includes(lower) ||
+          st.lastName.toLowerCase().includes(lower) ||
+          st.firstName.toLowerCase().includes(lower) ||
+          st.schuelerkennzahl.toLowerCase().includes(lower) ||
           fullName.includes(lower) ||
-          reverseName.includes(lower) ||
-          klassenzimmer.includes(lower)
+          revName.includes(lower) ||
+          kl.includes(lower)
         );
       });
     });
 
     return {
-      // States
       students,
       searchTerm,
+      allClassrooms,
 
       newStudentVorname,
       newStudentNachname,
       newStudentSchuelerkennzahl,
       selectedClassroomId,
-      allClassrooms,
 
-      // Computed
+      editStudentId,
+      editStudentVorname,
+      editStudentNachname,
+      editStudentKennzahl,
+      editSelectedClassroomId,
+
+      deleteModalOpen,
+      studentToDelete,
+
       filteredStudents,
 
-      // Methods
+      initMaterializeSelects,
       fetchStudents,
-      fetchAllClassrooms,
+      fetchClassrooms,
       createStudent,
-      deleteStudent,
+      openEditModal,
+      updateStudent,
+      confirmDelete,
+      cancelDelete,
+      deleteStudentNow,
     };
   },
 });
 </script>
 
 <style scoped>
-.student-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  background-color: #f4f4f9;
+/* Container */
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
   padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.search-section {
+/* Überschrift */
+.title {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Suchfeld + Button-Row */
+.search-row {
+  margin-top: 10px;
   margin-bottom: 20px;
 }
-
-.search-section input {
-  padding: 8px;
-  font-size: 16px;
-  width: 300px;
+.button-row {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.add-btn {
+  margin-right: 10px;
 }
 
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 16px;
-  font-family: "Arial", sans-serif;
+/* Liste der Schüler => anstatt table */
+.students-list {
+  margin-bottom: 30px;
+}
+.student-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+.student-row:last-child {
+  border-bottom: none;
 }
 
-.styled-table thead tr {
-  background-color: #343a40;
-  color: white;
+/* Buttons spacing */
+.mr-1 {
+  margin-right: 8px !important;
+}
+.action-btn {
+  margin-left: 10px;
 }
 
-.styled-table th,
-.styled-table td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #dddddd;
+/* Dropdown extra bottom space */
+.dropdown-area {
+  margin-bottom: 50px; /* Extra space */
 }
 
-.styled-table tbody tr:nth-of-type(even) {
-  background-color: #f9f9f9;
+/* Materialize-Select scroll fix */
+.dropdown-content.select-dropdown {
+  max-height: 300px !important;
+  overflow-y: auto !important;
 }
 
-.styled-table tbody tr:hover {
-  background-color: #f1f1f1;
+/* Custom overlay for Delete Confirm */
+.custom-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
 }
-
-.create-student-section {
-  margin-top: 30px;
-  text-align: left;
-  background-color: #fff;
-  padding: 20px;
+.custom-modal {
+  background: #fff;
+  padding: 20px 30px;
   border-radius: 6px;
+  max-width: 400px;
+  width: 90%;
 }
-
-.new-student-form {
+.modal-actions {
   display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  max-width: 500px;
-}
-
-.new-student-form label {
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.new-student-form input,
-.new-student-form select {
-  margin-top: 5px;
-  padding: 6px;
-  font-size: 14px;
-}
-
-.new-student-form button.create-student-btn {
-  background-color: #28a745;
-  color: white;
-  margin-top: 15px;
-  padding: 8px 14px;
-}
-
-.status-message {
-  margin-top: 10px;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.status-message.success {
-  color: #28a745;
-}
-
-.status-message.error {
-  color: #dc3545;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 </style>
