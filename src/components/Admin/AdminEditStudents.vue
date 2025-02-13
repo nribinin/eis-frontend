@@ -4,11 +4,7 @@
     <div class="row search-row">
       <div class="input-field col s12 m8 offset-m2">
         <i class="material-icons prefix">search</i>
-        <input
-          id="searchInput"
-          type="text"
-          v-model="searchTerm"
-        />
+        <input id="searchInput" type="text" v-model="searchTerm" />
         <label for="searchInput">Schüler suchen</label>
       </div>
     </div>
@@ -30,7 +26,6 @@
         :key="student.id"
         class="row student-row"
       >
-        <!-- Jede "Zeile" ein .row, jedes Feld ein .col s12 m2 etc. -->
         <div class="col s12 m2">
           <strong>Nachname:</strong> <br /> {{ student.lastName }}
         </div>
@@ -65,7 +60,6 @@
     <div id="modalAddStudent" class="modal">
       <div class="modal-content">
         <h5>Neuen Schüler anlegen</h5>
-
         <div class="row">
           <div class="input-field col s12 m6">
             <input
@@ -86,7 +80,6 @@
             <label for="nachname">Nachname</label>
           </div>
         </div>
-
         <div class="row">
           <div class="input-field col s12 m6">
             <input
@@ -153,7 +146,6 @@
             <label for="editNachname" class="active">Nachname</label>
           </div>
         </div>
-
         <div class="row">
           <div class="input-field col s12 m6">
             <input
@@ -182,7 +174,7 @@
       <div class="modal-footer">
         <a
           href="#!"
-          class="modal-close waves-effect btn grey btnmodal"
+          class="modal-close waves-effect btn grey btnmodal mr-1"
         >
           Abbrechen
         </a>
@@ -196,23 +188,31 @@
       </div>
     </div>
 
-    <!-- Delete-Modal (eigenes Overlay) -->
-    <div v-if="deleteModalOpen" class="custom-overlay">
-      <div class="custom-modal">
+    <!-- Modal: Schüler löschen bestätigen -->
+    <div id="modalDelete" class="modal">
+      <div class="modal-content">
         <h5>Löschen bestätigen</h5>
         <p>
           Bist du sicher, dass du den Schüler
           <strong>{{ studentToDelete?.lastName }} {{ studentToDelete?.firstName }}</strong>
           löschen möchtest?
         </p>
-        <div class="modal-actions">
-          <button class="waves-effect btn grey mr-1" @click="cancelDelete">
-            Abbrechen
-          </button>
-          <button class="waves-effect btn red" @click="deleteStudentNow">
-            Löschen
-          </button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <a
+          href="#!"
+          class="modal-close waves-effect btn grey mr-1"
+          @click="cancelDelete"
+        >
+          Abbrechen
+        </a>
+        <a
+          href="#!"
+          class="modal-close waves-effect btn red"
+          @click="deleteStudentNow"
+        >
+          Löschen
+        </a>
       </div>
     </div>
   </div>
@@ -265,7 +265,6 @@ export default defineComponent({
     const editSelectedClassroomId = ref<number | "">("");
 
     // Delete
-    const deleteModalOpen = ref(false);
     const studentToDelete = ref<StudentDto | null>(null);
 
     // Lifecycle
@@ -329,7 +328,10 @@ export default defineComponent({
           fetchStudents();
         }
       } catch (error: any) {
-        snackbar.push("Fehler beim Anlegen: " + (error.response?.data ?? error));
+        snackbar.push(
+          "Fehler beim Anlegen: " +
+            (error.response?.data ?? error)
+        );
       }
     }
 
@@ -343,7 +345,6 @@ export default defineComponent({
         (c) => c.name === student.classroom
       );
       editSelectedClassroomId.value = matched ? matched.id : "";
-
       nextTick(() => initMaterializeSelects());
     }
 
@@ -364,7 +365,8 @@ export default defineComponent({
         }
       } catch (error: any) {
         snackbar.push(
-          "Fehler beim Aktualisieren: " + (error.response?.data ?? error)
+          "Fehler beim Aktualisieren: " +
+            (error.response?.data ?? error)
         );
       }
     }
@@ -372,10 +374,11 @@ export default defineComponent({
     // DELETE
     function confirmDelete(student: StudentDto) {
       studentToDelete.value = student;
-      deleteModalOpen.value = true;
+      const elem = document.getElementById("modalDelete");
+      const instance = M.Modal.getInstance(elem);
+      instance.open();
     }
     function cancelDelete() {
-      deleteModalOpen.value = false;
       studentToDelete.value = null;
     }
     async function deleteStudentNow() {
@@ -385,7 +388,6 @@ export default defineComponent({
           `/admin/deleteStudent/${studentToDelete.value.schuelerkennzahl}`
         );
         snackbar.push("Schüler erfolgreich gelöscht.");
-        deleteModalOpen.value = false;
         studentToDelete.value = null;
         fetchStudents();
       } catch (error) {
@@ -416,23 +418,17 @@ export default defineComponent({
       students,
       searchTerm,
       allClassrooms,
-
       newStudentVorname,
       newStudentNachname,
       newStudentSchuelerkennzahl,
       selectedClassroomId,
-
       editStudentId,
       editStudentVorname,
       editStudentNachname,
       editStudentKennzahl,
       editSelectedClassroomId,
-
-      deleteModalOpen,
       studentToDelete,
-
       filteredStudents,
-
       initMaterializeSelects,
       fetchStudents,
       fetchClassrooms,
@@ -448,6 +444,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Rounded corners for Materialize modals */
+.modal {
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
 /* Container */
 .page-container {
   max-width: 1100px;
@@ -485,11 +487,6 @@ export default defineComponent({
 .student-row:last-child {
   border-bottom: none;
 }
-
-/* Buttons spacing */
-.mr-1 {
-  margin-right: 8px !important;
-}
 .action-btn {
   margin-left: 10px;
 }
@@ -503,27 +500,5 @@ export default defineComponent({
 .dropdown-content.select-dropdown {
   max-height: 300px !important;
   overflow-y: auto !important;
-}
-
-/* Custom overlay for Delete Confirm */
-.custom-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 9999;
-  display: flex; align-items: center; justify-content: center;
-}
-.custom-modal {
-  background: #fff;
-  padding: 20px 30px;
-  border-radius: 6px;
-  max-width: 400px;
-  width: 90%;
-}
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
 }
 </style>

@@ -1,83 +1,125 @@
 <template>
-  <div class="teacher-container">
-    <!-- Neues Formular: Lehrer anlegen -->
-    <div class="create-teacher-section">
-      <center><h3>Neuen Lehrer anlegen</h3></center>
-      <form @submit.prevent="createTeacher" class="new-teacher-form">
-        <!-- Name -->
-        <div>
-          <label for="teacherName">Name:</label>
-          <input
-            type="text"
-            id="teacherName"
-            v-model="newTeacherName"
-            required
-          />
-        </div>
+  <div class="page-container">
+    <!-- Suchfeld -->
+    <div class="row search-row">
+      <div class="input-field col s12 m8 offset-m2">
+        <i class="material-icons prefix">search</i>
+        <input id="searchInput" type="text" v-model="searchTerm" />
+        <label for="searchInput">Lehrer suchen</label>
+      </div>
+    </div>
 
-        <!-- Multi-Select: Zuordnung zu Lessons -->
-        <div>
-          <label for="lessonSelect"
-            >Unterrichtseinheiten (Lessons) auswählen:</label
+    <!-- Button: Neuen Lehrer anlegen -->
+    <div class="button-row">
+      <a
+        href="#modalAddTeacher"
+        class="waves-effect waves-light btn green modal-trigger add-btn"
+      >
+        Neuen Lehrer anlegen
+      </a>
+    </div>
+
+    <!-- Liste der Lehrer -->
+    <div class="teachers-list">
+      <div
+        v-for="teacher in filteredTeachers"
+        :key="teacher.id"
+        class="row teacher-row"
+      >
+        <div class="col s12 m6">
+          <strong>Name:</strong> <br /> {{ teacher.name }}
+        </div>
+        <div class="col s12 m6">
+          <button
+            class="waves-effect waves-light btn red right"
+            @click="confirmDelete(teacher)"
           >
-          <select id="lessonSelect" multiple v-model="selectedLessonIds">
-            <option
-              v-for="lesson in lessons"
-              :key="lesson.id"
-              :value="lesson.id"
-            >
-              {{ lesson.classRoomName }} - {{ lesson.subjectName }}
-            </option>
-          </select>
+            Löschen
+          </button>
         </div>
-
-        <button type="submit" class="btn waves-effect green">
-          Lehrer anlegen
-        </button>
-      </form>
+      </div>
     </div>
 
-    <!-- Suchfeld für Lehrer -->
-    <div class="search-section">
-      <label for="searchInput">Suchen (Name):</label>
-      <input
-        id="searchInput"
-        type="text"
-        v-model="searchTerm"
-        placeholder="Lehrername"
-      />
+    <!-- Modal: Neuen Lehrer anlegen -->
+    <div id="modalAddTeacher" class="modal">
+      <div class="modal-content">
+        <h5>Neuen Lehrer anlegen</h5>
+        <div class="row">
+          <!-- Lehrer-Name -->
+          <div class="input-field col s12">
+            <input
+              type="text"
+              id="teacherName"
+              v-model="newTeacherName"
+              required
+            />
+            <label for="teacherName">Name</label>
+          </div>
+        </div>
+        <div class="row">
+          <!-- Multi-Select: Zuordnung zu Lessons -->
+          <div class="input-field col s12 dropdown-area">
+            <label>Unterrichtseinheiten (Lessons) auswählen:</label>
+            <select multiple v-model="selectedLessonIds">
+              <option
+                v-for="lesson in lessons"
+                :key="lesson.id"
+                :value="lesson.id"
+              >
+                {{ lesson.classRoomName }} - {{ lesson.subjectName }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect btn grey mr-1">
+          Abbrechen
+        </a>
+        <a
+          href="#!"
+          class="modal-close waves-effect btn green"
+          @click.prevent="createTeacher"
+        >
+          Anlegen
+        </a>
+      </div>
     </div>
 
-    <!-- Tabelle der Lehrer -->
-    <table class="highlight responsive-table main-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Aktion</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="teacher in filteredTeachers" :key="teacher.id">
-          <td>{{ teacher.name }}</td>
-          <td>
-            <button
-              class="btn waves-effect red"
-              @click="deleteTeacher(teacher.id)"
-            >
-              Löschen
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Materialize Modal: Lehrer löschen bestätigen -->
+    <div id="modalDelete" class="modal">
+      <div class="modal-content">
+        <h5>Löschen bestätigen</h5>
+        <p>
+          Bist du sicher, dass du den Lehrer
+          <strong>{{ teacherToDelete?.name }}</strong>
+          löschen möchtest?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a
+          href="#!"
+          class="modal-close waves-effect btn grey mr-1"
+          @click="cancelDelete"
+        >
+          Abbrechen
+        </a>
+        <a
+          href="#!"
+          class="modal-close waves-effect btn red"
+          @click="deleteTeacherNow"
+        >
+          Löschen
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, nextTick } from "vue";
+import { defineComponent, ref, onMounted, computed, nextTick } from "vue";
 import axios from "axios";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 
 declare const M: any;
 
@@ -94,21 +136,41 @@ interface LessonDto {
 
 export default defineComponent({
   name: "TeacherManagement",
-
   setup() {
+    const snackbar = useSnackbarStore();
+
+    const teacherToDelete = ref<TeacherDto | null>(null);
+
+    // State: Lehrer
     const teachers = ref<TeacherDto[]>([]);
     const searchTerm = ref("");
 
+    // Neuer Lehrer
     const newTeacherName = ref("");
     const selectedLessonIds = ref<number[]>([]);
 
+    // Lessons
     const lessons = ref<LessonDto[]>([]);
 
-    onMounted(async () => {
-      await fetchTeachers();
-      await fetchLessons();
+    onMounted(() => {
+      const modalElems = document.querySelectorAll(".modal");
+      M.Modal.init(modalElems);
+      fetchTeachers();
+      fetchLessons();
     });
 
+    // Lessons laden + Materialize Select init
+    async function fetchLessons() {
+      try {
+        const response = await axios.get("/admin/getAllLessons");
+        lessons.value = response.data;
+        nextTick(() => initializeSelect());
+      } catch (error) {
+        snackbar.push("Fehler beim Laden der Lessons: " + error);
+      }
+    }
+
+    // Lehrer laden
     async function fetchTeachers() {
       try {
         const response = await axios.get("/admin/getAllTeachers");
@@ -118,22 +180,18 @@ export default defineComponent({
       }
     }
 
-    async function fetchLessons() {
-      try {
-        const response = await axios.get("/admin/getAllLessons");
-        lessons.value = response.data;
-        await nextTick();
-        initializeSelect();
-      } catch (error) {
-        snackbar.push("Fehler beim Laden der Lessons: " + error);
-      }
-    }
-
     function initializeSelect() {
       const elems = document.querySelectorAll("select");
-      M.FormSelect.init(elems);
+      M.FormSelect.init(elems, {
+        dropdownOptions: {
+          container: document.body,
+          constrainWidth: false,
+          coverTrigger: false,
+        },
+      });
     }
 
+    // Lehrer anlegen
     async function createTeacher() {
       try {
         const body = {
@@ -142,53 +200,77 @@ export default defineComponent({
         };
 
         const response = await axios.post("/admin/newTeacher", body, {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
 
         if (response.status === 201) {
+          snackbar.push("Neuer Lehrer erfolgreich angelegt!");
           newTeacherName.value = "";
           selectedLessonIds.value = [];
           await fetchTeachers();
         } else {
           await fetchTeachers();
+          snackbar.push("Lehrer angelegt/aktualisiert.");
         }
       } catch (error: any) {
         snackbar.push(
-          "Fehler beim Anlegen des Lehrers: " + error.response.data
+          "Fehler beim Anlegen des Lehrers: " +
+            (error.response?.data ?? error)
         );
       }
     }
 
-    async function deleteTeacher(teacherId: number) {
+    // Lehrer löschen
+    function confirmDelete(teacher: TeacherDto) {
+      teacherToDelete.value = teacher;
+      // Open the Materialize modal instance for deletion
+      const elem = document.getElementById("modalDelete");
+      const instance = M.Modal.getInstance(elem);
+      instance.open();
+    }
+    function cancelDelete() {
+      teacherToDelete.value = null;
+    }
+    async function deleteTeacherNow() {
+      if (!teacherToDelete.value) return;
       try {
-        await axios.delete(`/admin/deleteTeacher/${teacherId}`);
+        await axios.delete(`/admin/deleteTeacher/${teacherToDelete.value.id}`);
+        teacherToDelete.value = null;
         await fetchTeachers();
+        snackbar.push("Lehrer erfolgreich gelöscht.");
       } catch (error) {
         snackbar.push("Fehler beim Löschen des Lehrers: " + error);
       }
     }
 
+    // Gefilterte Lehrer
     const filteredTeachers = computed(() => {
-      if (!searchTerm.value.trim()) {
-        return teachers.value;
-      }
+      if (!searchTerm.value.trim()) return teachers.value;
       const lower = searchTerm.value.toLowerCase();
-      return teachers.value.filter((t) => t.name.toLowerCase().includes(lower));
+      return teachers.value.filter((t) =>
+        t.name.toLowerCase().includes(lower)
+      );
     });
 
     return {
+      // States
       teachers,
+      lessons,
       searchTerm,
       newTeacherName,
       selectedLessonIds,
-      lessons,
+      teacherToDelete,
 
+      // Methods
       fetchTeachers,
       fetchLessons,
       createTeacher,
-      deleteTeacher,
+      deleteTeacherNow,
+      initializeSelect,
+      confirmDelete,
+      cancelDelete,
+
+      // Computed
       filteredTeachers,
     };
   },
@@ -196,99 +278,53 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.teacher-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  background-color: #f4f4f9;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Rounded corners for all Materialize modals */
+.modal {
+  border-radius: 10px !important;
+  overflow: hidden;
 }
 
-.create-teacher-section {
-  margin-top: 30px;
-  text-align: left;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 6px;
-}
-
-.new-teacher-form {
-  display: flex;
-  flex-direction: column;
-  width: 300px;
+/* Zentrierter Container, ähnlich wie EditStudents */
+.page-container {
+  max-width: 700px;
   margin: 0 auto;
+  padding: 20px;
 }
 
-.new-teacher-form div {
-  margin-bottom: 10px;
-}
-
-.new-teacher-form label {
-  font-weight: bold;
-}
-
-.new-teacher-form select {
-  min-height: 100px; /* Damit man bei multiple-select mehr sieht */
-}
-
-.new-teacher-form button.create-teacher-btn {
-  background-color: #28a745;
-  color: white;
-  margin-top: 15px;
-  padding: 8px 14px;
-}
-
-.search-section {
-  margin-top: 30px;
+/* Suchfeld analog EditStudents */
+.search-row {
+  margin-top: 10px;
   margin-bottom: 20px;
 }
 
-.search-section input {
-  padding: 8px;
-  font-size: 16px;
-  width: 300px;
+.button-row {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.add-btn {
+  margin-right: 10px;
 }
 
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 16px;
-  font-family: "Arial", sans-serif;
+/* Liste der Lehrer */
+.teachers-list {
+  margin-bottom: 30px;
+}
+.teacher-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+.teacher-row:last-child {
+  border-bottom: none;
 }
 
-.styled-table thead tr {
-  background-color: #343a40;
-  color: white;
+/* Multi-select styling */
+.dropdown-area {
+  margin-bottom: 30px;
 }
 
-.styled-table th,
-.styled-table td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #dddddd;
-}
-
-.styled-table tbody tr:nth-of-type(even) {
-  background-color: #f9f9f9;
-}
-
-.styled-table tbody tr:hover {
-  background-color: #f1f1f1;
-}
-
-.status-message {
-  margin-top: 10px;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.status-message.success {
-  color: #28a745;
-}
-
-.status-message.error {
-  color: #dc3545;
+/* Materialize Scroll fix */
+.dropdown-content.select-dropdown {
+  max-height: 300px !important;
+  overflow-y: auto !important;
 }
 </style>
