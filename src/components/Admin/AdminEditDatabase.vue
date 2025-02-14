@@ -22,7 +22,7 @@
           <div class="card-content">
             <span class="card-title">Datenbank hochladen</span>
             <div class="file-field input-field">
-              <div class="btn primary blue">
+              <div class="btn primary amber">
                 <span>Sokrates Datei auswählen</span>
                 <input
                   type="file"

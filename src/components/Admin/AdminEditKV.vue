@@ -1,44 +1,43 @@
 <template>
   <div class="container">
-    <table class="highlight responsive-table">
-      <thead>
-        <tr>
-          <th>Klasse</th>
-          <th>Klassenvorstand</th>
-          <th>Aktion</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="classroom in classrooms" :key="classroom.id">
-          <td>{{ classroom.name }}</td>
-          <td>
+    <div class="classroom-wrapper">
+      <div
+        class="classroom-card"
+        v-for="classroom in classrooms"
+        :key="classroom.id"
+      >
+        <div class="card-content">
+          <h5 class="card-title">{{ classroom.name }}</h5>
+          <p>
+            <strong>Klassenvorstand:</strong>
+            <br>
             <span v-if="classroom.klassenvorstand">
               {{ classroom.klassenvorstand }}
             </span>
             <span v-else>
               <em>Kein Klassenvorstand</em>
             </span>
-          </td>
-          <td>
-            <a
-              href="#modalAssign"
-              class="btn modal-trigger red"
-              @click="openModal(classroom)"
-            >
-              Klassenvorstand ändern
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </p>
+        </div>
+        <div class="card-action">
+          <a
+            href="#modalAssign"
+            class="btn modal-trigger red"
+            @click="openModal(classroom)"
+          >
+            Klassenvorstand ändern
+          </a>
+        </div>
+      </div>
+    </div>
 
+    <!-- Modal zum Zuweisen des Klassenvorstands -->
     <div id="modalAssign" class="modal">
       <div class="modal-content">
         <h4>
           Klassenvorstand für
           <span v-if="selectedClassroom">{{ selectedClassroom.name }}</span>
         </h4>
-
         <div class="input-field">
           <select v-model="selectedTeacherId">
             <option disabled value="">-- Bitte wählen --</option>
@@ -46,7 +45,6 @@
               v-for="teacher in allTeachers"
               :key="teacher.id"
               :value="teacher.id"
-              color="red"
             >
               {{ teacher.name }}
             </option>
@@ -54,7 +52,6 @@
           <label>Lehrer auswählen</label>
         </div>
       </div>
-
       <div class="modal-footer">
         <a
           href="#!"
@@ -96,7 +93,6 @@ const allTeachers = ref<Teacher[]>([]);
 
 const selectedClassroom = ref<Classroom | null>(null);
 const selectedTeacherId = ref<number | "">("");
-
 const assigning = ref(false);
 
 async function fetchClassrooms() {
@@ -112,9 +108,7 @@ async function fetchAllTeachers() {
   try {
     const response = await axios.get("/admin/getAllTeachers");
     const data = response.data as { id: number; name: string }[];
-
     data.sort((a, b) => a.name.localeCompare(b.name));
-
     allTeachers.value = data;
   } catch (error) {
     snackbar.push("Fehler beim Laden der Lehrer: " + error);
@@ -140,9 +134,7 @@ function openModal(classroom: Classroom) {
 
 async function assignKlassenvorstand() {
   if (!selectedClassroom.value || !selectedTeacherId.value) return;
-
   assigning.value = true;
-
   try {
     const response = await axios.put("/admin/setKlassenvorstand", null, {
       params: {
@@ -150,7 +142,6 @@ async function assignKlassenvorstand() {
         teacherId: selectedTeacherId.value,
       },
     });
-
     if (response.status === 200) {
       await fetchClassrooms();
     }
@@ -172,17 +163,45 @@ onMounted(async () => {
 <style scoped>
 .container {
   margin-top: 40px;
+  max-width: 600px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.red-text {
-  color: red !important;
-}
-.green-text {
-  color: green !important;
+/* Wrapper für alle Karten (Kacheln) – vertikal gestapelt */
+.classroom-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.disabled {
-  pointer-events: none;
-  opacity: 0.6;
+/* Stil der einzelnen Klassen-Karten */
+.classroom-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 20px;
+}
+
+/* Typografie */
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+/* Aktion-Button: Rechts ausgerichtet */
+.card-action {
+  text-align: right;
+}
+
+/* Responsive Anpassungen */
+@media only screen and (max-width: 600px) {
+  .classroom-card {
+    padding: 15px;
+  }
+  .card-title {
+    font-size: 1.3rem;
+  }
 }
 </style>

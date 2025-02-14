@@ -40,7 +40,7 @@
         </div>
         <div class="col s12 m3">
           <button
-            class="waves-effect waves-light btn modal-trigger green mr-1"
+            class="waves-effect waves-light btn modal-trigger amber mr-1"
             href="#modalEditStudent"
             @click="openEditModal(student)"
           >
