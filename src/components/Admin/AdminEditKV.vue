@@ -1,7 +1,5 @@
 <template>
   <div class="container">
-    <h3>Klassenvorstände verwalten</h3>
-
     <table class="highlight responsive-table">
       <thead>
         <tr>

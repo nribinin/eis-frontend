@@ -1,82 +1,130 @@
 <template>
-    <div>
-      
-      <div class="button-box">
-        <p> Datenbank kann mit Sokrates CSV Datein gelehrt bzw. befüllt werden.</p>
-        <button @click="navigateTo('/admin/database')">Datenbank bearbeiten</button>
-      </div>
-      <div class="button-box">
-        <p>Klassenvorstand einer Klasse ändern bzw. hinzufügen (wie es bei der 5. Klasse der Fall ist)</p>
-        <button @click="navigateTo('/admin/editkv')">Klassenvorstand bearbeiten</button>
-      </div>
-      <div class="button-box">
-        <p>Alle Schüler werden hier angezeigt, welche gefiltert und gelöscht werden können. Gleichzeitig kann auch ein neuer Schüler angelegt werden.</p>
-        <button @click="navigateTo('/admin/editStudents')">Schüler bearbeiten</button>
-      </div>
-      <div class="button-box">
-        <p>Alle Lehrer werden hier angezeigt, welche gefiltert und gelöscht werden können. Gleichzeitig kann auch ein neuer Lehrer angelegt werden. </p>
-        <p>Beachte: Das Erstellen eines neuen Lehrers funktioniert noch nicht wie erwartet</p>
-        <button @click="navigateTo('/admin/editTeachers')">Lehrer bearbeiten</button>
+  <div class="container">
+    <div class="nav-wrapper">
+      <div class="nav-card" v-for="(item, index) in navItems" :key="index">
+        <div class="card-content">
+          <h4 class="card-title">{{ item.title }}</h4>
+          <p class="card-description">{{ item.description }}</p>
+        </div>
+        <div class="card-action">
+          <button
+            class="btn waves-effect waves-light"
+            @click="navigateTo(item.path)"
+          >
+            {{ item.buttonText }}
+          </button>
+        </div>
       </div>
     </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent } from 'vue';
-  import { useRouter } from 'vue-router';
-  
-  export default defineComponent({
-    name: 'NavigationButtons',
-    setup() {
-      const router = useRouter();
-  
-      const navigateTo = (path: string) => {
-        router.push(path);
-      };
-  
-      return {
-        navigateTo,
-      };
-    },
-  });
-  </script>
-  
-  <style scoped>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  .button-box {
-    background-color: #ffffff;
-    border-radius: 0.5em;
-    box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
-    padding: 2em;
-    margin: 1em;
-    text-align: left;
-  }
-  
-  .button-box p {
-    margin-bottom: 1em;
-    color: #333333;
-    text-align: left;
-    padding-left: 0;
-  }
-  
-  .button-box button {
-    background-color: #d9534f;
-    color: #ffffff;
-    border: none;
-    border-radius: 0.25em;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    font-size: 1em;
-    text-align: left;
-    margin-left: 0;
-  }
-  
-  .button-box button:hover {
-    background-color: #c9302c;
-  }
-  </style>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
+
+export default defineComponent({
+  name: "NavigationButtons",
+  setup() {
+    const router = useRouter();
+
+    const navigateTo = (path: string) => {
+      router.push(path);
+    };
+
+    const navItems = [
+      {
+        title: "Datenbank bearbeiten",
+        description:
+          "Datenbank kann mit Sokrates CSV Dateien gelehrt bzw. befüllt werden.",
+        buttonText: "Datenbank bearbeiten",
+        path: "/admin/database",
+      },
+      {
+        title: "Klassenvorstand bearbeiten",
+        description:
+          "Klassenvorstand einer Klasse ändern bzw. hinzufügen (wie es bei der 5. Klasse der Fall ist).",
+        buttonText: "Klassenvorstand bearbeiten",
+        path: "/admin/editkv",
+      },
+      {
+        title: "Schüler bearbeiten",
+        description:
+          "Alle Schüler werden hier angezeigt, welche gefiltert und gelöscht werden können. Gleichzeitig kann auch ein neuer Schüler angelegt werden.",
+        buttonText: "Schüler bearbeiten",
+        path: "/admin/editStudents",
+      },
+      {
+        title: "Lehrer bearbeiten",
+        description:
+          "Alle Lehrer werden hier angezeigt, welche gefiltert und gelöscht werden können. Gleichzeitig kann auch ein neuer Lehrer angelegt werden. (Beachte: Das Erstellen eines neuen Lehrers funktioniert noch nicht wie erwartet.)",
+        buttonText: "Lehrer bearbeiten",
+        path: "/admin/editTeachers",
+      },
+    ];
+
+    return {
+      navigateTo,
+      navItems,
+    };
+  },
+});
+</script>
+
+<style scoped>
+.container {
+  margin-top: 50px;
+}
+
+/* Wrapper so anpassen, dass keine Overflow-Abschneidung erfolgt */
+.nav-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: visible;
+  padding-bottom: 50px; /* sorgt dafür, dass der Shadow der letzten Karte nicht abgeschnitten wird */
+}
+
+/* Navigation-Card mit Ampel-Gradient (dezent) */
+.nav-card {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: #333;
+  overflow: visible; /* sicherstellen, dass der Shadow nicht abgeschnitten wird */
+}
+
+.nav-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* Typografie für Titel und Beschreibung */
+.card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.card-description {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Button-Styling: Basis von Materialize mit Anpassung */
+.btn {
+  background-color: #d9534f;
+  color: #fff;
+}
+
+.btn:hover {
+  background-color: #c9302c;
+}
+
+/* Optional: Anpassung für Materialize Waves */
+.waves-effect.waves-light {
+  color: #fff;
+}
+</style>
