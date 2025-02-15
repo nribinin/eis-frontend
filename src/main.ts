@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import persistedstate from "pinia-plugin-persistedstate"; // Plugin importieren
 
 import "materialize-css/dist/css/materialize.min.css";
 import App from "./App.vue";
@@ -13,7 +14,12 @@ import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
 const app = createApp(App);
 app.use(createVuetify({ components, directives }));
-app.use(createPinia());
+
+// Pinia einrichten und Persist Plugin hinzufügen
+const pinia = createPinia();
+pinia.use(persistedstate);
+app.use(pinia);
+
 app.use(router);
 
 const snackbar = useSnackbarStore();
@@ -25,25 +31,24 @@ axios.defaults.withXSRFToken = true;
 axios.defaults.xsrfCookieName = "XSRF-TOKEN";
 axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN";
 axios.interceptors.request.use((request) => {
-  console.log("axios.interceptors.request", request);
   return request;
 });
 axios.interceptors.response.use(null, (error) => {
-  console.log("axios.interceptors.response error", error);
   if (error.response.status == 401) {
     snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
     router.push("/");
   }
   if (error.response.status == 403) {
-    snackbar.push(
-      "Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen."
-    );
+    snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
   }
-  if (
-    error.response.status == 500 &&
-    error.response.data === "Bad credentials"
-  ) {
+  if (error.response.status == 500 && error.response.data === "Bad credentials") {
     snackbar.push("Benutzername oder Passwort falsch.");
+  }
+  else if (error.response.status == 500 && error.response.data === "Empty Password") {
+    snackbar.push("Passwort darf nicht leer sein.");
+  }
+  else if (error.response.status == 500 && error.response.data === "Benutzer nicht gefunden") {
+    snackbar.push("Username nicht gefunden.");
   }
   return Promise.reject(error);
 });

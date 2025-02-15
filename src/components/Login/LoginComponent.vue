@@ -11,8 +11,9 @@
             <label for="password">Password:</label>
             <input type="password" v-model="form.password" placeholder="Enter your password" required/>
           </div>
+          <button @click="login">Log In</button>
+
         </form>
-        <button @click="login">Log In</button>
       </div>
     </div>
   </div>
