@@ -10,6 +10,7 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import "vuetify/styles";
+import 'choices.js/public/assets/styles/choices.min.css'
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
 const app = createApp(App);

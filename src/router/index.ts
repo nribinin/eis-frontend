@@ -73,6 +73,13 @@ const router = createRouter({
 router.beforeResolve((to, from, next) => {
   const auth = useAuthenticationStore()
   const snackbar = useSnackbarStore()
+  if (to.name === "login" && auth.loggedIn) {
+    if (auth.role === Roles.TEACHER) {
+      return next({ name: "lehrer" })
+    } else if (auth.role === Roles.STUDENT) {
+      return next({ name: "schueler" })
+    }
+  }
   if (
     auth.loaded && // If Authentication is not loaded preferred to let navigation through and redirect later if first data call returns with 401 or 403.
     !auth.loggedIn &&

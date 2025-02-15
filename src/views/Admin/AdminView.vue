@@ -27,7 +27,7 @@ import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
 const snackbar = useSnackbarStore()
 const authenticationStore = useAuthenticationStore();
 const router = useRouter();
-const title = "Datenbank bearbeiten";
+const title = "Admin Panel";
 async function logout() {
   try {
     const success = await authenticationStore.logout();

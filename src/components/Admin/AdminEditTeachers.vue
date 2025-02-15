@@ -27,10 +27,10 @@
         :key="teacher.id"
         class="row teacher-row"
       >
-        <div class="col s12 m6">
+        <div class="col s12 m2">
           <strong>Lehrer-Name:</strong> <br /> {{ teacher.name }}
         </div>
-        <div class="col s12 m6">
+        <div class="col s12 m3">
           <!-- Bearbeiten-Button -->
           <button
             class="waves-effect waves-light btn amber mr-1"

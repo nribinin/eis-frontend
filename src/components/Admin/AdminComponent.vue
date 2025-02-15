@@ -8,7 +8,7 @@
         </div>
         <div class="card-action">
           <button
-            class="btn waves-effect waves-light"
+            class="btn gradient-btn waves-effect waves-light"
             @click="navigateTo(item.path)"
           >
             {{ item.buttonText }}
@@ -113,14 +113,20 @@ export default defineComponent({
   margin-bottom: 20px;
 }
 
-/* Button-Styling: Basis von Materialize mit Anpassung */
-.btn {
-  background-color: #d9534f;
+/* Gradient Button */
+.gradient-btn {
+  background: linear-gradient(45deg, #c9302c, #ec971f);
+
+  border: none;
   color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: background 0.3s ease;
 }
 
-.btn:hover {
-  background-color: #c9302c;
+.gradient-btn:hover {
+  background: linear-gradient(45deg, #cc0f08, #e98801);
 }
 
 /* Optional: Anpassung für Materialize Waves */
