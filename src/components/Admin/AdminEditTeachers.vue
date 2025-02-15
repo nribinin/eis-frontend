@@ -12,12 +12,12 @@
 
     <!-- Button: Neuen Lehrer anlegen -->
     <div class="button-row">
-      <a
-        href="#modalAddTeacher"
-        class="waves-effect waves-light btn green modal-trigger add-btn"
-      >
-        Neuen Lehrer anlegen
-      </a>
+      <button
+            class="waves-effect waves-light btn green mr-1 add-btn"
+            @click="openAddModal()"
+          >
+            Neuen Lehrer anlegen
+          </button>
     </div>
 
     <!-- Liste der Lehrer -->
@@ -307,6 +307,43 @@ export default defineComponent({
       }
 
       nextTick(() => initMaterializeSelect());
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.maxHeight = '600px';
+          (el as HTMLElement).style.overflowY = 'auto';
+        });
+      }, 50); // Adjust the timeout if needed
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown span');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.color = 'black';
+        });
+      }, 50); // Adjust the timeout if needed
+    }
+
+    function openAddModal() {
+      // Materialize Modal #modalEditTeacher öffnen
+      const elem = document.getElementById("modalAddTeacher");
+      if (elem) {
+        const instance = M.Modal.getInstance(elem);
+        instance.open();
+      }
+
+      nextTick(() => initMaterializeSelect());
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.maxHeight = '600px';
+          (el as HTMLElement).style.overflowY = 'auto';
+        });
+      }, 50); // Adjust the timeout if needed
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown span');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.color = 'black';
+        });
+      }, 50); // Adjust the timeout if needed
     }
 
     /**
@@ -391,6 +428,7 @@ export default defineComponent({
       confirmDelete,
       cancelDelete,
       deleteTeacherNow,
+      openAddModal,
 
       // computed
       filteredTeachers

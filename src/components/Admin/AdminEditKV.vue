@@ -31,6 +31,7 @@
           </div>
         </div>
       </div>
+      <br>
     </div>
 
     <div id="modalAssign" class="modal">
@@ -222,5 +223,7 @@ onMounted(async () => {
 .teacher-info {
   flex: 1;
 }
-
+h5 {
+  margin: 0;
+}
 </style>

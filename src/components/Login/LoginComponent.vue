@@ -107,8 +107,11 @@ async function login() {
 /* Media Queries für mobile Ansicht */
 @media (max-width: 30em) {
   .login-box {
-    width: 90%;
+    width: 200%;
     padding: 1em;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .login-box h1 {

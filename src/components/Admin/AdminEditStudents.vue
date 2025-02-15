@@ -11,12 +11,12 @@
 
     <!-- Button: Neuen Schüler anlegen -->
     <div class="button-row">
-      <a
-        href="#modalAddStudent"
-        class="waves-effect waves-light btn green modal-trigger add-btn"
-      >
-        Neuen Schüler anlegen
-      </a>
+      <button
+            class="waves-effect waves-light btn green add-btn"
+            @click="openAddModal()"
+          >
+            Neuen Schüler anlegen
+          </button>
     </div>
 
     <!-- Liste der Schüler (statt 'table') -->
@@ -346,6 +346,20 @@ export default defineComponent({
       );
       editSelectedClassroomId.value = matched ? matched.id : "";
       nextTick(() => initMaterializeSelects());
+
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.maxHeight = '600px';
+          (el as HTMLElement).style.overflowY = 'auto';
+        });
+      }, 50); // Adjust the timeout if needed
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown span');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.color = 'black';
+        });
+      }, 50); // Adjust the timeout if needed
     }
 
     async function updateStudent() {
@@ -369,6 +383,30 @@ export default defineComponent({
             (error.response?.data ?? error)
         );
       }
+    }
+
+    function openAddModal() {
+      // Materialize Modal #modalEditTeacher öffnen
+      const elem = document.getElementById("modalAddStudent");
+      if (elem) {
+        const instance = M.Modal.getInstance(elem);
+        instance.open();
+      }
+
+      nextTick(() => initMaterializeSelects());
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.maxHeight = '600px';
+          (el as HTMLElement).style.overflowY = 'auto';
+        });
+      }, 50); // Adjust the timeout if needed
+      setTimeout(() => {
+        const dropdownElems = document.querySelectorAll('.dropdown-content.select-dropdown span');
+        dropdownElems.forEach(el => {
+          (el as HTMLElement).style.color = 'black';
+        });
+      }, 50); // Adjust the timeout if needed
     }
 
     // DELETE
@@ -438,6 +476,7 @@ export default defineComponent({
       confirmDelete,
       cancelDelete,
       deleteStudentNow,
+      openAddModal,
     };
   },
 });
@@ -496,9 +535,15 @@ export default defineComponent({
   margin-bottom: 50px; /* Extra space */
 }
 
-/* Materialize-Select scroll fix */
-.dropdown-content.select-dropdown {
-  max-height: 300px !important;
-  overflow-y: auto !important;
+@media only screen and (max-width: 600px) {
+  /* Modal-Größe und Position anpassen */
+  .modal {
+    width: 90% !important;
+    max-height: 90% !important;
+    /* Damit bei Bedarf gescrollt werden kann */
+    overflow-y: auto !important;
+  }
+  
 }
+
 </style>
