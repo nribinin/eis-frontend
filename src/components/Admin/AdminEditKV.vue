@@ -1,19 +1,19 @@
 <template>
   <div class="container">
-    <div class="classroom-wrapper">
+    <div class="hitclass-wrapper">
       <div
-        class="classroom-card"
-        v-for="classroom in classrooms"
-        :key="classroom.id"
+        class="hitclass-card"
+        v-for="hitclass in hitclasses"
+        :key="hitclass.id"
       >
         <div class="card-content">
-          <h5 class="card-title">{{ classroom.name }}</h5>
+          <h5 class="card-title">{{ hitclass.name }}</h5>
           <div class="info-row">
             <div class="teacher-info">
               <strong>Klassenvorstand:</strong>
               <br>
-              <span v-if="classroom.klassenvorstand">
-                {{ classroom.klassenvorstand }}
+              <span v-if="hitclass.klassenvorstand">
+                {{ hitclass.klassenvorstand }}
               </span>
               <span v-else>
                 <em>Kein Klassenvorstand</em>
@@ -23,7 +23,7 @@
               <a
                 href="#modalAssign"
                 class="btn modal-trigger red"
-                @click="openModal(classroom)"
+                @click="openModal(hitclass)"
               >
                 Klassenvorstand ändern
               </a>
@@ -38,7 +38,7 @@
       <div class="modal-content">
         <h4>
           Klassenvorstand für
-          <span v-if="selectedClassroom">{{ selectedClassroom.name }}</span>
+          <span v-if="selectedHitclass">{{ selectedHitclass.name }}</span>
         </h4>
         <div class="input-field">
           <select v-model="selectedTeacherId" style="color:black">
@@ -84,23 +84,23 @@ interface Teacher {
   name: string;
 }
 
-interface Classroom {
+interface Hitclass {
   id: number;
   name: string;
   klassenvorstand: string | null;
 }
 
-const classrooms = ref<Classroom[]>([]);
+const hitclasses = ref<Hitclass[]>([]);
 const allTeachers = ref<Teacher[]>([]);
 
-const selectedClassroom = ref<Classroom | null>(null);
+const selectedHitclass = ref<Hitclass | null>(null);
 const selectedTeacherId = ref<number | "">("");
 const assigning = ref(false);
 
-async function fetchClassrooms() {
+async function fetchHitclasses() {
   try {
-    const response = await axios.get("/admin/classrooms/with-teachers");
-    classrooms.value = response.data;
+    const response = await axios.get("/admin/hitclasses/with-teachers");
+    hitclasses.value = response.data;
   } catch (error) {
     snackbar.push("Fehler beim Laden der Klassen: " + error);
   }
@@ -117,8 +117,8 @@ async function fetchAllTeachers() {
   }
 }
 
-function openModal(classroom: Classroom) {
-  selectedClassroom.value = classroom;
+function openModal(hitclass: Hitclass) {
+  selectedHitclass.value = hitclass;
   selectedTeacherId.value = "";
   assigning.value = false;
 
@@ -152,17 +152,17 @@ function openModal(classroom: Classroom) {
 }
 
 async function assignKlassenvorstand() {
-  if (!selectedClassroom.value || !selectedTeacherId.value) return;
+  if (!selectedHitclass.value || !selectedTeacherId.value) return;
   assigning.value = true;
   try {
     const response = await axios.put("/admin/setKlassenvorstand", null, {
       params: {
-        classroomId: selectedClassroom.value.id,
+        hitclassId: selectedHitclass.value.id,
         teacherId: selectedTeacherId.value,
       },
     });
     if (response.status === 200) {
-      await fetchClassrooms();
+      await fetchHitclasses();
     }
   } catch (error: any) {
     snackbar.push("Fehler beim Zuweisen des Klassenvorstands: " + error);
@@ -172,7 +172,7 @@ async function assignKlassenvorstand() {
 }
 
 onMounted(async () => {
-  await fetchClassrooms();
+  await fetchHitclasses();
   await fetchAllTeachers();
   const modalElems = document.querySelectorAll(".modal");
   M.Modal.init(modalElems);
@@ -188,13 +188,13 @@ onMounted(async () => {
   margin-right: auto;
 }
 
-.classroom-wrapper {
+.hitclass-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.classroom-card {
+.hitclass-card {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);

@@ -296,7 +296,7 @@ export default defineComponent({
           teacherId: ampel.teacherId,
           nname: ampel.studentName.split(" ")[1] || "???",
           vname: ampel.studentName.split(" ")[0] || "",
-          klasse: ampel.classroomName || "",
+          klasse: ampel.hitclassName || "",
           fach: ampel.subjectLangbezeichnung || "",
           selectedColor: ampel.farbe || null,
           note: ampel.bemerkung || "",

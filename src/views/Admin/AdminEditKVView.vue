@@ -12,7 +12,7 @@
             <li>
               <h3>{{ title }}</h3>
             </li>
-            <div class="selectedSite:hover logout right">
+            <div class="selectedSite:hover logout right ">
               <div class="material-icons" @click="logout">exit_to_app</div>
             </div>
           </ul>
@@ -129,4 +129,13 @@ nav {
   cursor: pointer;
   padding-left: 0.5em;
 }
+
+@media screen and (max-width: 600px) {
+  h3{
+    font-size: 1.8em; 
+  }
+  
+  
+}
+
 </style>

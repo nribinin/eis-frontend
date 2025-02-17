@@ -128,4 +128,9 @@ nav {
   cursor: pointer;
   padding-left: 0.5em;
 }
+@media screen and (max-width: 600px) {
+  h3{
+    font-size: 1.8em; 
+  }
+}
 </style>

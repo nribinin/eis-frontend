@@ -51,7 +51,6 @@ async function goBack() {
 
 <style scoped>
 .maincontainer {
-  overflow-y: auto;
   max-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -133,5 +132,10 @@ nav {
 .goBack {
   cursor: pointer;
   padding-left: 0.5em;
+}
+@media screen and (max-width: 600px) {
+  h3{
+    font-size: 1.8em; 
+  }
 }
 </style>

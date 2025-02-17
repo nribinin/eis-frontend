@@ -18,17 +18,20 @@ export const useAuthenticationStore = defineStore("authentication", () => {
             Authentication,
             AxiosResponse<Authentication>,
             LoginRequest
-        >("/auth/login", loginRequest)
+        >("/auth/login", loginRequest,{baseURL: "http://localhost:8080/"})
         
         if (response.status === 200) {
             setAuthentication(response.data)
+            console.log(response.data)
             return true
         }
         return false
     }
 
     async function logout(): Promise<boolean> {
-        const response = await axios.post<string>("/auth/logout")
+        const response = await axios.post<string>("/auth/logout", null, {
+            baseURL: "http://localhost:8080/"
+        });
         if (response.status === 200) {
             loggedIn.value = false
             role.value = null
@@ -67,7 +70,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
     }
 
     async function checkLoggedIn() {
-        axios.get<Authentication>("/auth").then((response) => {
+        axios.get<Authentication>("/auth", {baseURL: "http://localhost:8080/"}).then((response) => {
             if (response.status === 200) {
                 setAuthentication(response.data)
             }

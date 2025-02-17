@@ -27,20 +27,20 @@
         :key="teacher.id"
         class="row teacher-row"
       >
-        <div class="col s12 m2">
-          <strong>Lehrer-Name:</strong> <br /> {{ teacher.name }}
+        <div class="col s12 m6">
+          <strong>Name:</strong> <br /> {{ teacher.name }}
         </div>
-        <div class="col s12 m3">
+        <div class="col s12 m6">
           <!-- Bearbeiten-Button -->
           <button
-            class="waves-effect waves-light btn amber mr-1"
+            class="waves-effect waves-light btn modal-trigger amber mr-1"
             @click="openEditModal(teacher)"
           >
             Bearbeiten
           </button>
           <!-- Löschen-Button -->
           <button
-            class="waves-effect waves-light btn red right"
+            class="waves-effect waves-light btn red"
             @click="confirmDelete(teacher)"
           >
             Löschen
@@ -75,7 +75,7 @@
                 :key="lesson.id"
                 :value="lesson.id"
               >
-                {{ lesson.classRoomName }} - {{ lesson.subjectName }}
+                {{ lesson.hitclassName }} - {{ lesson.subjectName }}
               </option>
             </select>
           </div>
@@ -115,7 +115,7 @@
                 :key="lesson.id"
                 :value="lesson.id"
               >
-                {{ lesson.classRoomName }} - {{ lesson.subjectName }}
+                {{ lesson.hitclassName }} - {{ lesson.subjectName }}
               </option>
             </select>
           </div>
@@ -178,12 +178,12 @@ interface TeacherWithLessonsDto {
 
 /**
  * LessonDto, wie vom Endpoint /admin/getAllLessons
- * { id: number, subjectName: string, classRoomName: string }
+ * { id: number, subjectName: string, hitclassName: string }
  */
 interface LessonDto {
   id: number;
   subjectName: string;
-  classRoomName: string;
+  hitclassName: string;
 }
 
 export default defineComponent({
@@ -235,7 +235,7 @@ export default defineComponent({
 
     /**
      * GET /admin/getAllLessons
-     * => LessonDto[] (id, subjectName, classRoomName)
+     * => LessonDto[] (id, subjectName, hitclassName)
      */
     async function fetchAllLessons() {
       try {
@@ -440,7 +440,7 @@ export default defineComponent({
 <style scoped>
 /* Zentrierter Container */
 .page-container {
-  max-width: 1100px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -485,8 +485,4 @@ export default defineComponent({
   overflow: hidden;
 }
 
-/* Buttons spacing */
-.mr-1 {
-  margin-right: 8px !important;
-}
 </style>

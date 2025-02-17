@@ -132,7 +132,7 @@ interface Subject {
   subjectKurzbezeichnung: string;
   subjectLangbezeichnung: string;
   gegenstandsart: string;
-  classroomName: string;
+  hitclassName: string;
   farbe: string;
   bemerkung: string | null;
   updatedAt: string | null;

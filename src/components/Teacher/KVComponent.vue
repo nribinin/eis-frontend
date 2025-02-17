@@ -75,7 +75,7 @@ interface AmpelDto {
 interface KvStudentAmpelDto {
   studentId: number;
   studentName: string;
-  schuelerkennzahl: string;
+  studentKennzahl: string;
   ampelEntries: AmpelDto[];
   isOpen?: boolean;
 }

@@ -33,10 +33,10 @@
           <strong>Vorname:</strong> <br /> {{ student.firstName }}
         </div>
         <div class="col s12 m3">
-          <strong>Schülerkennzahl:</strong> <br /> {{ student.schuelerkennzahl }}
+          <strong>Schülerkennzahl:</strong> <br /> {{ student.studentKennzahl }}
         </div>
         <div class="col s12 m2">
-          <strong>Klasse:</strong> <br /> {{ student.classroom }}
+          <strong>Klasse:</strong> <br /> {{ student.hitclass }}
         </div>
         <div class="col s12 m3">
           <button
@@ -83,18 +83,18 @@
         <div class="row">
           <div class="input-field col s12 m6">
             <input
-              id="schuelerkennzahl"
-              v-model="newStudentSchuelerkennzahl"
+              id="studentKennzahl"
+              v-model="newStudentStudentKennzahl"
               type="text"
               required
             />
-            <label for="schuelerkennzahl">Schülerkennzahl</label>
+            <label for="studentKennzahl">Schülerkennzahl</label>
           </div>
           <div class="input-field col s12 m6 dropdown-area">
-            <select v-model="selectedClassroomId" required>
+            <select v-model="selectedHitclassId" required>
               <option disabled value="">Bitte wählen</option>
               <option
-                v-for="c in allClassrooms"
+                v-for="c in allHitclasses"
                 :key="c.id"
                 :value="c.id"
               >
@@ -157,10 +157,10 @@
             <label for="editKennzahl" class="active">Schülerkennzahl</label>
           </div>
           <div class="input-field col s12 m6 dropdown-area">
-            <select v-model="editSelectedClassroomId" required>
+            <select v-model="editSelectedHitclassId" required>
               <option disabled value="">Bitte wählen</option>
               <option
-                v-for="c in allClassrooms"
+                v-for="c in allHitclasses"
                 :key="c.id"
                 :value="c.id"
               >
@@ -230,11 +230,11 @@ interface StudentDto {
   id: number;
   firstName: string;
   lastName: string;
-  schuelerkennzahl: string;
-  classroom: string | null;
+  studentKennzahl: string;
+  hitclass: string | null;
 }
 
-interface ClassroomOption {
+interface HitclassOption {
   id: number;
   name: string;
 }
@@ -249,20 +249,20 @@ export default defineComponent({
     const searchTerm = ref("");
 
     // State: Klassen
-    const allClassrooms = ref<ClassroomOption[]>([]);
+    const allHitclasses = ref<HitclassOption[]>([]);
 
     // Add Student
     const newStudentVorname = ref("");
     const newStudentNachname = ref("");
-    const newStudentSchuelerkennzahl = ref("");
-    const selectedClassroomId = ref<number | "">("");
+    const newStudentStudentKennzahl = ref("");
+    const selectedHitclassId = ref<number | "">("");
 
     // Edit Student
     const editStudentId = ref<number | null>(null);
     const editStudentVorname = ref("");
     const editStudentNachname = ref("");
     const editStudentKennzahl = ref("");
-    const editSelectedClassroomId = ref<number | "">("");
+    const editSelectedHitclassId = ref<number | "">("");
 
     // Delete
     const studentToDelete = ref<StudentDto | null>(null);
@@ -274,7 +274,7 @@ export default defineComponent({
       M.Modal.init(modalElems);
 
       fetchStudents();
-      fetchClassrooms();
+      fetchHitclasses();
     });
 
     // After we fill <select> options, re-init FormSelect
@@ -298,10 +298,10 @@ export default defineComponent({
       }
     }
 
-    async function fetchClassrooms() {
+    async function fetchHitclasses() {
       try {
-        const resp = await axios.get("/admin/classrooms");
-        allClassrooms.value = resp.data;
+        const resp = await axios.get("/admin/hitclasses");
+        allHitclasses.value = resp.data;
         nextTick(() => initMaterializeSelects());
       } catch (error) {
         snackbar.push("Fehler beim Laden der Klassen: " + error);
@@ -314,8 +314,8 @@ export default defineComponent({
         const body = {
           vorname: newStudentVorname.value,
           nachname: newStudentNachname.value,
-          schuelerkennzahl: newStudentSchuelerkennzahl.value,
-          classroomId: selectedClassroomId.value,
+          studentKennzahl: newStudentStudentKennzahl.value,
+          hitclassId: selectedHitclassId.value,
         };
         const resp = await axios.post("/admin/newStudent", body);
         if (resp.status === 200 || resp.status === 201) {
@@ -323,8 +323,8 @@ export default defineComponent({
           // Reset
           newStudentVorname.value = "";
           newStudentNachname.value = "";
-          newStudentSchuelerkennzahl.value = "";
-          selectedClassroomId.value = "";
+          newStudentStudentKennzahl.value = "";
+          selectedHitclassId.value = "";
           fetchStudents();
         }
       } catch (error: any) {
@@ -340,11 +340,11 @@ export default defineComponent({
       editStudentId.value = student.id;
       editStudentVorname.value = student.firstName;
       editStudentNachname.value = student.lastName;
-      editStudentKennzahl.value = student.schuelerkennzahl;
-      const matched = allClassrooms.value.find(
-        (c) => c.name === student.classroom
+      editStudentKennzahl.value = student.studentKennzahl;
+      const matched = allHitclasses.value.find(
+        (c) => c.name === student.hitclass
       );
-      editSelectedClassroomId.value = matched ? matched.id : "";
+      editSelectedHitclassId.value = matched ? matched.id : "";
       nextTick(() => initMaterializeSelects());
 
       setTimeout(() => {
@@ -369,8 +369,8 @@ export default defineComponent({
           id: editStudentId.value,
           vorname: editStudentVorname.value,
           nachname: editStudentNachname.value,
-          schuelerkennzahl: editStudentKennzahl.value,
-          classroomId: editSelectedClassroomId.value,
+          studentKennzahl: editStudentKennzahl.value,
+          hitclassId: editSelectedHitclassId.value,
         };
         const resp = await axios.put("/admin/updateStudent", body);
         if (resp.status === 200) {
@@ -423,7 +423,7 @@ export default defineComponent({
       if (!studentToDelete.value) return;
       try {
         await axios.delete(
-          `/admin/deleteStudent/${studentToDelete.value.schuelerkennzahl}`
+          `/admin/deleteStudent/${studentToDelete.value.studentKennzahl}`
         );
         snackbar.push("Schüler erfolgreich gelöscht.");
         studentToDelete.value = null;
@@ -440,11 +440,11 @@ export default defineComponent({
       return students.value.filter((st) => {
         const fullName = (st.lastName + " " + st.firstName).toLowerCase();
         const revName = (st.firstName + " " + st.lastName).toLowerCase();
-        const kl = st.classroom ? st.classroom.toLowerCase() : "";
+        const kl = st.hitclass ? st.hitclass.toLowerCase() : "";
         return (
           st.lastName.toLowerCase().includes(lower) ||
           st.firstName.toLowerCase().includes(lower) ||
-          st.schuelerkennzahl.toLowerCase().includes(lower) ||
+          st.studentKennzahl.toLowerCase().includes(lower) ||
           fullName.includes(lower) ||
           revName.includes(lower) ||
           kl.includes(lower)
@@ -455,21 +455,21 @@ export default defineComponent({
     return {
       students,
       searchTerm,
-      allClassrooms,
+      allHitclasses,
       newStudentVorname,
       newStudentNachname,
-      newStudentSchuelerkennzahl,
-      selectedClassroomId,
+      newStudentStudentKennzahl,
+      selectedHitclassId,
       editStudentId,
       editStudentVorname,
       editStudentNachname,
       editStudentKennzahl,
-      editSelectedClassroomId,
+      editSelectedHitclassId,
       studentToDelete,
       filteredStudents,
       initMaterializeSelects,
       fetchStudents,
-      fetchClassrooms,
+      fetchHitclasses,
       createStudent,
       openEditModal,
       updateStudent,
