@@ -1,15 +1,17 @@
 <template>
   <div class="my-collapsible-container">
     <h2>Meine Schüler mit Ampeln</h2>
+    <!-- Eingabefeld zum Filtern nach Namen -->
+    <input type="text" v-model="filter" placeholder="Namen filtern" />
 
     <ul class="my-collapsible-list">
       <li
-        v-for="(student, idx) in students"
+        v-for="student in filteredStudents"
         :key="student.studentId"
         class="my-collapsible-item"
       >
         <!-- Header zum Auf-/Zuklappen -->
-        <div class="my-collapsible-header" @click="toggle(idx)">
+        <div class="my-collapsible-header" @click="toggle(student)">
           <h3>{{ student.studentName }}</h3>
           <i>{{ student.isOpen ? "▼" : "►" }}</i>
         </div>
@@ -35,11 +37,11 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(ampel, aIndex) in student.ampelEntries"
+                  v-for="(ampel, aIndex) in sortedAmpelEntries(student.ampelEntries)"
                   :key="aIndex"
                   :class="rowClass(ampel.farbe)"
                 >
-                  <td>{{ ampel.subjectKurzbezeichnung }}</td>
+                  <td>{{ ampel.subjectLangbezeichnung }}</td>
                   <td>{{ ampel.farbe ?? "–" }}</td>
                   <td>{{ ampel.bemerkung ?? "Keine Bemerkung" }}</td>
                   <td>{{ formatDate(ampel.updatedAt) ?? "–" }}</td>
@@ -55,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { format } from "date-fns";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
@@ -68,6 +70,7 @@ interface AmpelDto {
   farbe: string | null;
   bemerkung: string | null;
   subjectKurzbezeichnung: string;
+  subjectLangbezeichnung: string;
   updatedAt: string | null;
 }
 
@@ -82,11 +85,19 @@ interface KvStudentAmpelDto {
 
 const students = ref<KvStudentAmpelDto[]>([]);
 
+// Filter für die Schülernamen
+const filter = ref("");
+
+// Computed-Property zum Filtern der Schüler basierend auf dem eingegebenen Filter
+const filteredStudents = computed(() =>
+  students.value.filter(student =>
+    student.studentName.toLowerCase().includes(filter.value.toLowerCase())
+  )
+);
+
 // Lifecycle
 onMounted(async () => {
   try {
-    // Passe den Pfad an deinen tatsächlichen Backend-Mapping an
-    // z. B. '/teacher-ampel/kv/getStudents'
     const resp = await axios.get("/teacher-ampel/kv/getStudents");
     if (!resp.data || (Array.isArray(resp.data) && resp.data.length === 0)) {
       snackbar.push(
@@ -94,18 +105,14 @@ onMounted(async () => {
       );
       return;
     }
-    // 1) "resp.data" => Array<KvStudentAmpelDto>
-    // 2) Sortieren nach studentName
     const sortedData = resp.data.sort(
       (a: KvStudentAmpelDto, b: KvStudentAmpelDto) => {
-        // Kleinschreibung beider Namen, und dann localeCompare
         return a.studentName
           .toLowerCase()
           .localeCompare(b.studentName.toLowerCase());
       }
     );
 
-    // 3) Mit .map(...) isOpen hinzufügen
     students.value = sortedData.map((s: KvStudentAmpelDto) => ({
       ...s,
       isOpen: false,
@@ -118,8 +125,8 @@ onMounted(async () => {
 });
 
 // Auf-/Zuklappen
-function toggle(index: number) {
-  students.value[index].isOpen = !students.value[index].isOpen;
+function toggle(student: KvStudentAmpelDto) {
+  student.isOpen = !student.isOpen;
 }
 
 /**
@@ -144,6 +151,22 @@ function rowClass(farbe: string | null): string {
 function formatDate(dateString: string | null) {
   if (!dateString) return null;
   return format(new Date(dateString), "dd.MM.yyyy HH:mm");
+}
+
+/**
+ * Sortiert die Ampel-Einträge in der gewünschten Reihenfolge:
+ * Schwarz, Rot, Gelb, Grün
+ */
+function sortedAmpelEntries(ampelEntries: AmpelDto[]): AmpelDto[] {
+  const order: Record<string, number> = {
+    SCHWARZ: 1,
+    ROT: 2,
+    GELB: 3,
+    GRUEN: 4
+  };
+  return [...ampelEntries].sort(
+    (a, b) => (order[a.farbe ?? ""] || 5) - (order[b.farbe ?? ""] || 5)
+  );
 }
 </script>
 
@@ -224,5 +247,16 @@ function formatDate(dateString: string | null) {
 .slide-fade-leave-to {
   transform: translateY(-10px);
   opacity: 0;
+}
+
+/* Angepasster Style für den Filter-Input */
+input[type="text"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 </style>
