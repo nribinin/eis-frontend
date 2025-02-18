@@ -37,9 +37,9 @@ const form = ref<LoginRequest>({
 async function login() {
   const sucessful = await authenticationStore.login(form.value)
   if (sucessful) {
-    if(authenticationStore.role === Roles.STUDENT) {
+    if(authenticationStore.roles.includes(Roles.STUDENT)) {
       router.push("/schueler")
-    } else if(authenticationStore.role === Roles.TEACHER) {
+    } else if(authenticationStore.roles.includes(Roles.TEACHER)) {
       router.push("/lehrer")
     }
   }

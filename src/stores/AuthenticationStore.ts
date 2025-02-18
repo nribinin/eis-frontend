@@ -6,89 +6,97 @@ import type { Authentication } from "@/types/Authentication.ts"
 import { Roles } from "@/enum/Roles.ts"
 import type { RouteLocationResolvedGeneric } from "vue-router"
 
-
 export const useAuthenticationStore = defineStore("authentication", () => {
-    const loaded = ref(false)
-    const loggedIn = ref(false)
-    const role = ref<Roles | null>(null)
-    const displayName = ref<string | null>(null)
+  const loaded = ref(false)
+  const loggedIn = ref(false)
+  const roles = ref<Roles[]>([])  // Mehrere Rollen speichern
+  const displayName = ref<string | null>(null)
 
-    async function login(loginRequest: LoginRequest): Promise<boolean> {
-        const response = await axios.post<
-            Authentication,
-            AxiosResponse<Authentication>,
-            LoginRequest
-        >("/auth/login", loginRequest,{baseURL: "http://localhost:8080/"})
-        
+  async function login(loginRequest: LoginRequest): Promise<boolean> {
+    const response = await axios.post<
+      Authentication,
+      AxiosResponse<Authentication>,
+      LoginRequest
+    >("/auth/login", loginRequest, { baseURL: "http://localhost:8080/" })
+
+    if (response.status === 200) {
+      setAuthentication(response.data)
+      console.log(response.data)
+      return true
+    }
+    return false
+  }
+
+  async function logout(): Promise<boolean> {
+    const response = await axios.post<string>("/auth/logout", null, {
+      baseURL: "http://localhost:8080/"
+    })
+    if (response.status === 200) {
+      loggedIn.value = false
+      roles.value = []  // Array zurücksetzen
+      displayName.value = null
+      return true
+    }
+    return false
+  }
+
+  function setAuthentication(data: Authentication): void {
+    const authorities = data.authorities.map((value) => value.authority)
+    displayName.value = data.details.displayName
+    roles.value = []  // Array initialisieren
+
+    // Prüfe auf alle relevanten Rollen:
+    if (authorities.includes("ROLE_LEHRER")) {
+      roles.value.push(Roles.TEACHER)
+    }
+    if (authorities.includes("ROLE_ADMIN")) {
+      roles.value.push(Roles.ADMIN)
+    }
+    if (authorities.includes("ROLE_SCHUELER")) {
+      roles.value.push(Roles.STUDENT)
+    }
+
+    // Setze loggedIn nur, wenn mindestens eine Rolle vorhanden ist
+    loggedIn.value = roles.value.length > 0
+    loaded.value = true
+  }
+
+  function isRouteVisible(route: RouteLocationResolvedGeneric): boolean {
+    // Falls in den Meta-Daten mehrere Rollen erlaubt sind, prüfen, ob
+    // mindestens eine Rolle vorhanden ist, die in roles.value vorkommt.
+    if (
+      route.meta?.role !== undefined &&
+      Array.isArray(route.meta.role) &&
+      route.meta.role.length > 0 &&
+      (!loggedIn.value || !route.meta.role.some((r: Roles) => roles.value.includes(r)))
+    ) {
+      return false
+    }
+    return true
+  }
+
+  async function checkLoggedIn() {
+    axios
+      .get<Authentication>("/auth", { baseURL: "http://localhost:8080/" })
+      .then((response) => {
         if (response.status === 200) {
-            setAuthentication(response.data)
-            console.log(response.data)
-            return true
+          setAuthentication(response.data)
         }
-        return false
-    }
+      })
+  }
 
-    async function logout(): Promise<boolean> {
-        const response = await axios.post<string>("/auth/logout", null, {
-            baseURL: "http://localhost:8080/"
-        });
-        if (response.status === 200) {
-            loggedIn.value = false
-            role.value = null
-            displayName.value = null
-            return true
-        }
-        return false
-    }
+  void checkLoggedIn()
 
-    function setAuthentication(data: Authentication): void {
-        const authorities = data.authorities.map((value) => value.authority)
-        displayName.value = data.details.displayName
-        if (authorities.includes("ROLE_LEHRER")) {
-            loggedIn.value = true
-            role.value = Roles.TEACHER
-        } else if (authorities.includes("ROLE_SCHUELER")) {
-            loggedIn.value = true
-            role.value = Roles.STUDENT
-        } else {
-            loggedIn.value = false
-            role.value = null
-        }
-        loaded.value = true
-    }
-
-    function isRouteVisible(route: RouteLocationResolvedGeneric): boolean {
-        if (
-            route.meta?.role !== undefined &&
-            Array.isArray(route.meta.role) &&
-            route.meta.role.length > 0 &&
-            (!loggedIn.value || !route.meta.role.includes(role.value))
-        ) {
-            return false
-        }
-        return true
-    }
-
-    async function checkLoggedIn() {
-        axios.get<Authentication>("/auth", {baseURL: "http://localhost:8080/"}).then((response) => {
-            if (response.status === 200) {
-                setAuthentication(response.data)
-            }
-        })
-    }
-
-    void checkLoggedIn()
-
-    return {
-      loaded,
-      loggedIn,
-      login,
-      logout,
-      role,
-      isRouteVisible,
-      displayName,
-      checkLoggedIn, // Falls du diesen später noch benötigst
+  return {
+    loaded,
+    loggedIn,
+    login,
+    logout,
+    roles, // jetzt ein Array mit allen Rollen
+    isRouteVisible,
+    displayName,
+    checkLoggedIn,
   }
 }, {
   persist: true // <-- sorgt dafür, dass der State gespeichert wird
-});
+})

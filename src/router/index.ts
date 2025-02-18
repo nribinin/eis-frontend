@@ -46,37 +46,58 @@ const router = createRouter({
       path: "/admin",
       name: "admin",
       component: () => import("@/views/Admin/AdminView.vue"),
+      meta: { 
+        authRequired: true,
+        role: [Roles.ADMIN] 
+      }
     },
     {
       path: "/admin/database",
       name: "database",
       component: () => import("@/views/Admin/AdminSokratesView.vue"),
+      meta: { 
+        authRequired: true,
+        role: [Roles.ADMIN] 
+      }
     },
     {
       path: "/admin/editkv",
       name: "editkv",
       component: () => import("@/views/Admin/AdminEditKVView.vue"),
+      meta: { 
+        authRequired: true,
+        role: [Roles.ADMIN] 
+      }
     },
     {
       path: "/admin/editStudents",
       name: "editStudents",
       component: () => import("@/views/Admin/AdminEditStudentsView.vue"),
+      meta: { 
+        authRequired: true,
+        role: [Roles.ADMIN] 
+      }
     },
     {
       path: "/admin/editTeachers",
       name: "editTeachers",
       component: () => import("@/views/Admin/AdminEditTeachersView.vue"),
+      meta: { 
+        authRequired: true,
+        role: [Roles.ADMIN] 
+      }
     },
   ],
 })
 
 router.beforeResolve((to, from, next) => {
   const auth = useAuthenticationStore()
+  console.log(auth)
   const snackbar = useSnackbarStore()
   if (to.name === "login" && auth.loggedIn) {
-    if (auth.role === Roles.TEACHER) {
+    if (auth.roles.includes(Roles.TEACHER)) {
       return next({ name: "lehrer" })
-    } else if (auth.role === Roles.STUDENT) {
+    } else if (auth.roles.includes(Roles.STUDENT)) {
       return next({ name: "schueler" })
     }
   }
@@ -93,7 +114,7 @@ router.beforeResolve((to, from, next) => {
     to.meta?.role != undefined &&
     Array.isArray(to.meta.role) &&
     to.meta.role.length > 0 &&
-    !to.meta.role.includes(auth.role)
+    !to.meta.role.some((role: Roles) => auth.roles.includes(role))
   ) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.")
     router.back()

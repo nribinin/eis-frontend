@@ -44,7 +44,6 @@ async function logout() {
 
 <style scoped>
 .maincontainer {
-  overflow-y: auto;
   max-height: 100vh;
   display: flex;
   flex-direction: column;
