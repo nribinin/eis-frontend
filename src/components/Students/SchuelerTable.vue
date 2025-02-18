@@ -122,6 +122,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 const snackbar = useSnackbarStore();
+import testdaten from "@/assets/testdaten.json";
 
 interface Subject {
   ampelId: number;
@@ -138,14 +139,26 @@ interface Subject {
   updatedAt: string | null;
   lessonId: number;
 }
-
+/**
+ * Mit dem import werden die Daten aus der Response aus dem Backend gelesen
+ * um die testdaten zu verwenden, welche nichts mit dem Backend zutun haben
+ * wird in der fetchSubjects Funktion anstatt dem axios.get die testdaten aus der json file testdaten.json im assets ordenr importiert
+ * um wieder die echten daten zu verwenden einfach beide LOC ändern
+ * 
+ *  --> const response = await axios.get("/student-ampel/getSchueler");
+ *  --> subjectList.value = response.data;
+ */
+//const subjectList = ref<Subject[]>(testData);
 const subjectList = ref<Subject[]>([]);
 const expandedGroups = ref<number[]>([]);
 
+
 const fetchSubjects = async () => {
   try {
-    const response = await axios.get("/student-ampel/getSchueler");
-    subjectList.value = response.data;
+    //const response = await axios.get("/student-ampel/getSchueler");
+    const response = testdaten
+    //subjectList.value = response.data;
+    subjectList.value = response;
   } catch (error) {
     snackbar.push(
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
