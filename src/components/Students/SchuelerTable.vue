@@ -36,8 +36,9 @@
               v-if="group.length > 1"
               :class="getGroupRowClass(group)"
               class="z-depth-5"
+              style="border-top: 1px solid black"
             >
-              <td>
+              <td style="padding-left: 50px">
                 {{ group[0].subjectLangbezeichnung }}
                 <img
                   v-if="
@@ -78,15 +79,16 @@
                   style="cursor: pointer"
                 />
               </td>
-              <td colspan="3"></td>
+              <td colspan="3" ></td>
             </tr>
             <template v-if="expandedGroups.includes(index)">
               <tr
                 v-for="subject in group"
                 :key="subject.ampelId"
                 :class="getRowClass(subject)"
+                style="border-top: 1px solid black"
               >
-                <td style="padding-left: 50px">
+                <td style="padding-left: 100px">
                   {{ subject.subjectLangbezeichnung }}
                 </td>
                 <td style="padding-left: 50px">{{ subject.teacherName }}</td>
@@ -104,8 +106,9 @@
             :key="subject.ampelId"
             :class="getRowClass(subject)"
             class="z-depth-5"
+            style="border-top: 1px solid black"
           >
-            <td>{{ subject.subjectLangbezeichnung }}</td>
+            <td style="padding-left: 50px;">{{ subject.subjectLangbezeichnung }}</td>
             <td>{{ subject.teacherName }}</td>
             <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
             <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
