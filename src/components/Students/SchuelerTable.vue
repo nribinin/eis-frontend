@@ -1,31 +1,31 @@
 <!-- SchuelerTable.vue -->
 <template>
-  <div class="schuelerTable">
+  <div class="schuelerTable modern-container">
     <template v-if="subjectList.length === 0">
       <p class="no-data-message">Kein Lehrer hat dich noch bewertet</p>
     </template>
     <template v-else>
-      <table class="striped">
-        <thead class="fixed theader">
+      <table class="modern-table">
+        <thead class="modern-thead">
           <tr>
             <th class="col">
               <div class="icontext">
-                <i class="material-icons">school</i>Gegenstand
+                <i class="material-icons">school</i> Gegenstand
               </div>
             </th>
             <th class="col">
               <div class="icontext">
-                <i class="material-icons">person</i>Lehrer
+                <i class="material-icons">person</i> Lehrer
               </div>
             </th>
             <th class="col">
               <div class="icontext">
-                <i class="material-icons">insert_invitation</i>Datum
+                <i class="material-icons">insert_invitation</i> Datum
               </div>
             </th>
             <th class="col">
               <div class="icontext">
-                <i class="material-icons">subject</i>Anmerkung
+                <i class="material-icons">subject</i> Anmerkung
               </div>
             </th>
           </tr>
@@ -34,81 +34,67 @@
           <template v-for="(group, index) in groupedSubjectList" :key="index">
             <tr
               v-if="group.length > 1"
-              :class="getGroupRowClass(group)"
-              class="z-depth-5"
-              style="border-top: 1px solid black"
+              :class="[
+                'group-row',
+                getGroupRowClass(group),
+                { 'selected-group': expandedGroups.includes(index) }
+              ]"
+              @click="toggleGroup(index)"
             >
-              <td style="padding-left: 50px">
+              <td>
+                <!-- Icon und Label zur Kennzeichnung von Gruppierungen -->
+                <i class="material-icons group-icon">
+                  {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
+                </i>
+                <span class="group-label">Gruppe</span>
                 {{ group[0].subjectLangbezeichnung }}
+                <!-- Dropdown-Icons -->
                 <img
-                  v-if="
-                    getGroupRowClass(group) === 'rowblack' &&
-                    !expandedGroups.includes(index)
-                  "
+                  v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
                   src="@/assets/arrowDown_White.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
-                  @click="toggleGroup(index)"
-                  style="cursor: pointer"
                 />
                 <img
-                  v-if="
-                    getGroupRowClass(group) === 'rowblack' &&
-                    expandedGroups.includes(index)
-                  "
+                  v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
                   src="@/assets/arrowUp_White.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
-                  @click="toggleGroup(index)"
-                  style="cursor: pointer"
                 />
                 <img
                   v-else-if="!expandedGroups.includes(index)"
                   src="@/assets/arrowDown.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
-                  @click="toggleGroup(index)"
-                  style="cursor: pointer"
                 />
                 <img
                   v-else-if="expandedGroups.includes(index)"
                   src="@/assets/arrowUp.png"
                   alt="dropdown icon"
                   class="dropdown-icon"
-                  @click="toggleGroup(index)"
-                  style="cursor: pointer"
                 />
               </td>
-              <td colspan="3" ></td>
+              <td colspan="3"></td>
             </tr>
             <template v-if="expandedGroups.includes(index)">
               <tr
                 v-for="subject in group"
                 :key="subject.ampelId"
-                :class="getRowClass(subject)"
-                style="border-top: 1px solid black"
+                :class="['data-row', getRowClass(subject), 'child-row']"
               >
-                <td style="padding-left: 100px">
-                  {{ subject.subjectLangbezeichnung }}
-                </td>
-                <td style="padding-left: 50px">{{ subject.teacherName }}</td>
-                <td style="padding-left: 50px">
-                  {{ formatDate(subject.updatedAt) || "Kein Datum" }}
-                </td>
-                <td style="padding-left: 50px">
-                  {{ subject.bemerkung || "Keine Bemerkung" }}
-                </td>
+                <td>{{ subject.subjectLangbezeichnung }}</td>
+                <td>{{ subject.teacherName }}</td>
+                <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
+                <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
               </tr>
             </template>
           </template>
           <tr
             v-for="subject in singleSubjectList"
             :key="subject.ampelId"
-            :class="getRowClass(subject)"
-            class="z-depth-5"
-            style="border-top: 1px solid black"
+            :class="['data-row', getRowClass(subject)]"
           >
-            <td style="padding-left: 50px;">{{ subject.subjectLangbezeichnung }}</td>
+            <td>{{ subject.subjectLangbezeichnung }}</td>
             <td>{{ subject.teacherName }}</td>
             <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
             <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
@@ -125,7 +111,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 const snackbar = useSnackbarStore();
-import testdaten from "@/assets/testdaten.json";
+import testdata from "@/assets/testdaten.json";
 
 interface Subject {
   ampelId: number;
@@ -142,25 +128,15 @@ interface Subject {
   updatedAt: string | null;
   lessonId: number;
 }
-/**
- * Mit dem import werden die Daten aus der Response aus dem Backend gelesen
- * um die testdaten zu verwenden, welche nichts mit dem Backend zutun haben
- * wird in der fetchSubjects Funktion anstatt dem axios.get die testdaten aus der json file testdaten.json im assets ordenr importiert
- * um wieder die echten daten zu verwenden einfach beide LOC ändern
- * 
- *  --> const response = await axios.get("/student-ampel/getSchueler");
- *  --> subjectList.value = response.data;
- */
-//const subjectList = ref<Subject[]>(testData);
+
 const subjectList = ref<Subject[]>([]);
 const expandedGroups = ref<number[]>([]);
 
-
 const fetchSubjects = async () => {
   try {
-    //const response = await axios.get("/student-ampel/getSchueler");
-    const response = testdaten
-    //subjectList.value = response.data;
+    // const response = await axios.get("/student-ampel/getSchueler");
+    // subjectList.value = response.data;
+    const response = testdata;
     subjectList.value = response;
   } catch (error) {
     snackbar.push(
@@ -238,55 +214,148 @@ onMounted(fetchSubjects);
 </script>
 
 <style scoped>
+/* Container mit modernem Hintergrund, abgerundeten Ecken und Schatten */
+.modern-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Modernes Tabellendesign */
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tabellenkopf mit Farbverlauf */
+.modern-thead {
+  background: linear-gradient(90deg, #4b79a1, #283e51);
+  color: #fff;
+}
+
+.modern-thead th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+/* Allgemeine Zellgestaltung */
+th,
+td {
+  padding: 15px 20px;
+}
+
+/* Zeilenstile und Hover-Effekte */
+.data-row,
+.group-row {
+  transition: background-color 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+
+.data-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.01);
+}
+
+.group-row {
+  font-weight: bold;
+}
+
+.group-row:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scale(1.01);
+}
+
+/* Farbeffekte für die Zeilen */
 .rowgreen {
   background-color: #009640 !important;
+  color: #fff;
 }
+
 .rowyellow {
   background-color: #ffc107 !important;
+  color: #333;
 }
+
 .rowred {
   background-color: #e30613 !important;
-  color: white;
+  color: #fff;
 }
+
 .rowblack {
-  background-color: #000000 !important;
-  color: white;
+  background-color: #000 !important;
+  color: #fff;
 }
+
+/* Border für ausgeklappte Gruppen */
+.selected-group {
+  border: 1px solid #007bff;
+  border-radius: 4px;
+}
+
+/* Einrückung und Border für ausgeklappte Kindzeilen */
+.child-row td:first-child {
+  padding-left: 170px;
+}
+
+.child-row {
+  border-left: 3px solid #007bff;
+}
+
+/* Styling für Gruppenkennzeichnung */
+.group-icon {
+  font-size: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
+  opacity: 0.8;
+}
+
+.group-label {
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #007bff;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin-right: 5px;
+  font-size: 0.8em;
+}
+
+/* Styling für Icon und Text im Header */
 .icontext {
-  display: flex !important;
-  align-items: center !important;
-  flex-direction: initial;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
 .dropdown-icon {
+  width: 18px;
   margin-left: 10px;
-  height: 15px;
+  transition: transform 0.3s;
 }
-.fixed {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 999;
+
+.group-row:hover .dropdown-icon {
+  transform: scale(1.1);
 }
-.theader {
-  background-color: white;
-}
-.schuelerTable {
-  width: 100%;
-  overflow-x: auto;
-}
-.striped {
-  width: 100%;
-  min-width: 600px;
-  border-collapse: collapse;
-}
+
+/* Meldung bei fehlenden Daten */
 .no-data-message {
   text-align: center;
   font-size: 1.5em;
   margin-top: 2em;
   color: #555;
 }
+
+/* Responsive Anpassungen */
 @media (max-width: 768px) {
-  .col {
+  .modern-thead th,
+  td {
+    padding: 10px;
     font-size: 0.9rem;
   }
   .icontext {
