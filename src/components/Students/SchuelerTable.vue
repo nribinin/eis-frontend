@@ -5,102 +5,105 @@
       <p class="no-data-message">Kein Lehrer hat dich noch bewertet</p>
     </template>
     <template v-else>
-      <table class="modern-table">
-        <thead class="modern-thead">
-          <tr>
-            <th class="col">
-              <div class="icontext">
-                <i class="material-icons">school</i> Gegenstand
-              </div>
-            </th>
-            <th class="col">
-              <div class="icontext">
-                <i class="material-icons">person</i> Lehrer
-              </div>
-            </th>
-            <th class="col">
-              <div class="icontext">
-                <i class="material-icons">insert_invitation</i> Datum
-              </div>
-            </th>
-            <th class="col">
-              <div class="icontext">
-                <i class="material-icons">subject</i> Anmerkung
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="(group, index) in groupedSubjectList" :key="index">
-            <tr
-              v-if="group.length > 1"
-              :class="[
-                'group-row',
-                getGroupRowClass(group),
-                { 'selected-group': expandedGroups.includes(index) }
-              ]"
-              @click="toggleGroup(index)"
-            >
-              <td>
-                <!-- Icon und Label zur Kennzeichnung von Gruppierungen -->
-                <i class="material-icons group-icon">
-                  {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
-                </i>
-                <span class="group-label">Gruppe</span>
-                {{ group[0].subjectLangbezeichnung }}
-                <!-- Dropdown-Icons -->
-                <img
-                  v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
-                  src="@/assets/arrowDown_White.png"
-                  alt="dropdown icon"
-                  class="dropdown-icon"
-                />
-                <img
-                  v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
-                  src="@/assets/arrowUp_White.png"
-                  alt="dropdown icon"
-                  class="dropdown-icon"
-                />
-                <img
-                  v-else-if="!expandedGroups.includes(index)"
-                  src="@/assets/arrowDown.png"
-                  alt="dropdown icon"
-                  class="dropdown-icon"
-                />
-                <img
-                  v-else-if="expandedGroups.includes(index)"
-                  src="@/assets/arrowUp.png"
-                  alt="dropdown icon"
-                  class="dropdown-icon"
-                />
-              </td>
-              <td colspan="3"></td>
+      <!-- Wrapper für vertikales Scrollen -->
+      <div class="table-vertical-scroll">
+        <table class="modern-table">
+          <thead class="modern-thead">
+            <tr>
+              <th class="col">
+                <div class="icontext">
+                  <i class="material-icons">school</i> Gegenstand
+                </div>
+              </th>
+              <th class="col">
+                <div class="icontext">
+                  <i class="material-icons">person</i> Lehrer
+                </div>
+              </th>
+              <th class="col">
+                <div class="icontext">
+                  <i class="material-icons">insert_invitation</i> Datum
+                </div>
+              </th>
+              <th class="col">
+                <div class="icontext">
+                  <i class="material-icons">subject</i> Anmerkung
+                </div>
+              </th>
             </tr>
-            <template v-if="expandedGroups.includes(index)">
+          </thead>
+          <tbody>
+            <template v-for="(group, index) in groupedSubjectList" :key="index">
               <tr
-                v-for="subject in group"
-                :key="subject.ampelId"
-                :class="['data-row', getRowClass(subject), 'child-row']"
+                v-if="group.length > 1"
+                :class="[
+                  'group-row',
+                  getGroupRowClass(group),
+                  { 'selected-group': expandedGroups.includes(index) }
+                ]"
+                @click="toggleGroup(index)"
               >
-                <td>{{ subject.subjectLangbezeichnung }}</td>
-                <td>{{ subject.teacherName }}</td>
-                <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
-                <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
+                <td>
+                  <!-- Icon und Label zur Kennzeichnung von Gruppierungen -->
+                  <i class="material-icons group-icon">
+                    {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
+                  </i>
+                  <span class="group-label">Gruppe</span>
+                  {{ group[0].subjectLangbezeichnung }}
+                  <!-- Dropdown-Icons -->
+                  <img
+                    v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
+                    src="@/assets/arrowDown_White.png"
+                    alt="dropdown icon"
+                    class="dropdown-icon"
+                  />
+                  <img
+                    v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
+                    src="@/assets/arrowUp_White.png"
+                    alt="dropdown icon"
+                    class="dropdown-icon"
+                  />
+                  <img
+                    v-else-if="!expandedGroups.includes(index)"
+                    src="@/assets/arrowDown.png"
+                    alt="dropdown icon"
+                    class="dropdown-icon"
+                  />
+                  <img
+                    v-else-if="expandedGroups.includes(index)"
+                    src="@/assets/arrowUp.png"
+                    alt="dropdown icon"
+                    class="dropdown-icon"
+                  />
+                </td>
+                <td colspan="3"></td>
               </tr>
+              <template v-if="expandedGroups.includes(index)">
+                <tr
+                  v-for="subject in group"
+                  :key="subject.ampelId"
+                  :class="['data-row', getRowClass(subject), 'child-row']"
+                >
+                  <td>{{ subject.subjectLangbezeichnung }}</td>
+                  <td>{{ subject.teacherName }}</td>
+                  <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
+                  <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
+                </tr>
+              </template>
             </template>
-          </template>
-          <tr
-            v-for="subject in singleSubjectList"
-            :key="subject.ampelId"
-            :class="['data-row', getRowClass(subject)]"
-          >
-            <td>{{ subject.subjectLangbezeichnung }}</td>
-            <td>{{ subject.teacherName }}</td>
-            <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
-            <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
-          </tr>
-        </tbody>
-      </table>
+            <tr
+              v-for="subject in singleSubjectList"
+              :key="subject.ampelId"
+              :class="['data-row', getRowClass(subject)]"
+            >
+              <td>{{ subject.subjectLangbezeichnung }}</td>
+              <td>{{ subject.teacherName }}</td>
+              <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
+              <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </template>
   </div>
 </template>
@@ -111,7 +114,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 const snackbar = useSnackbarStore();
-import testdata from "@/assets/testdaten.json";
+ import testdata from "@/assets/testdaten.json";
 
 interface Subject {
   ampelId: number;
@@ -134,10 +137,10 @@ const expandedGroups = ref<number[]>([]);
 
 const fetchSubjects = async () => {
   try {
-    // const response = await axios.get("/student-ampel/getSchueler");
-    // subjectList.value = response.data;
-    const response = testdata;
-    subjectList.value = response;
+    const response = await axios.get("/student-ampel/getSchueler");
+    subjectList.value = response.data;
+    // Für Testdaten: 
+    //subjectList.value = testdata;
   } catch (error) {
     snackbar.push(
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
@@ -222,13 +225,19 @@ onMounted(fetchSubjects);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Wrapper für vertikales Scrollen */
+.table-vertical-scroll {
+  max-height: 70vh; /* Passt die Höhe je nach Bedarf an */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* für flüssiges Scrollen auf iOS */
+}
+
 /* Modernes Tabellendesign */
 .modern-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: #ffffff;
   border-radius: 10px;
+  width: 100%;
+  border-collapse: separate; /* oder collapse, je nach gewünschtem Effekt */
+  background: #ffffff;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -250,6 +259,10 @@ onMounted(fetchSubjects);
 th,
 td {
   padding: 15px 20px;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  list-style: none;
 }
 
 /* Zeilenstile und Hover-Effekte */
