@@ -33,33 +33,24 @@
           <div class="flex-container-Horizontal">
             <img class="imgHeight" src="@/assets/Ampel_schwarz.png" />
             <div class="flex-container-Vertical center-align">
-              <h6
-                class="black roundedCorners white-text"
-                style="max-width: fit-content"
-              >
+              <h6 class="black roundedCorners white-text" style="max-width: fit-content">
                 Schwarz
               </h6>
               <h6>Nicht beurteilt</h6>
             </div>
           </div>
+          <div class="flex-center">
+            <button @click="toggleLegend" class="waves-effect waves-light btn" v-if="legendVisible" style="float: right !important;">
+              <i class="material-icons">arrow_upward</i>
+            </button>
+            
+          </div>
         </div>
-        <div class="flex-center">
-          <button
-            @click="toggleLegend"
-            class="waves-effect waves-light btn"
-            v-if="legendVisible"
-          >
-            <i class="material-icons">arrow_upward</i>
-          </button>
-          <button
-            @click="toggleLegend"
-            class="waves-effect waves-light btn"
-            style="margin: 10px"
-            v-else
-          >
-            <i class="material-icons">arrow_downward</i>
-          </button>
-        </div>
+        <div class="flex-container-Legend" v-else>
+        <button @click="toggleLegend" class="waves-effect waves-light btn" style="color: white; float: right !important;">
+              <i class="material-icons">arrow_downward</i>
+            </button>
+          </div>
       </div>
     </transition>
   </div>
@@ -86,45 +77,55 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 .flex-container-Legend {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 10px;
 }
+
 .flex-container-Horizontal {
   display: flex;
   align-items: center;
   margin: 10px;
 }
+
 .flex-container-Vertical {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
+
 .imgHeight {
   height: 100px;
 }
+
 .roundedCorners {
   padding: 10px;
   border-radius: 10px;
 }
+
 .slideTransition {
   transition: all 0.5s ease;
 }
+
 .slide-fade-enter,
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
 }
+
 @media (max-width: 768px) {
   .imgHeight {
     height: 70px;
   }
+
   .flex-container-Legend {
     flex-direction: column;
     align-items: center;
   }
+
   .flex-container-Horizontal {
     margin: 5px 0;
   }

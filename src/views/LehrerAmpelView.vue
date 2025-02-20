@@ -19,16 +19,16 @@
           </ul>
         </nav>
       </div>
-      <Legende />
+      
     </div>
-
+    <Legende />
     <Teacher />
   </div>
 </template>
 
 <script lang="ts" setup>
 import Teacher from "@/components/Teacher/TeacherComponent.vue";
-import Legende from "@/components/Teacher/TeacherHeader.vue";
+import Legende from "@/components/Teacher/LegendeKomp.vue";
 import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts";
 import { useRouter } from "vue-router";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
@@ -119,6 +119,7 @@ h3 {
   margin-right: 1em;
   margin-left: 10px;
   margin-top: 6px;
+  margin-bottom: -5.6px;
 }
 .logout:hover {
   cursor: pointer;
@@ -133,6 +134,28 @@ h3 {
   }
   ul {
     height: 10vh !important;
+  }
+}
+@media screen and (max-width: 600px) {
+  h3 {
+    display: none;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 0.3em;
+  }
+
+  .choose {
+    width: 100%;
+  }
+
+  .logout {
+    width: 100%;
+    margin: 0;
+  }
+  li {
+    font-size: 1em;
   }
 }
 </style>

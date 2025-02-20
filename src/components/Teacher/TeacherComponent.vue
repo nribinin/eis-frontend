@@ -18,7 +18,7 @@
               <input type="checkbox" v-model="weisseAmpel" />
               <span>Weiße Ampel</span>
             </label>
-            <p>Nur Schüler, die noch nicht eingetragen wurden (oder Grau)</p>
+            <p>Nur Schüler, die noch nicht eingetragen wurden</p>
           </div>
           <div class="col">
             <label>
@@ -224,7 +224,7 @@ export default defineComponent({
         }
         if (this.weisseAmpel) {
           const isNullOrGrau =
-            student.selectedColor === null || student.selectedColor === "GRAU";
+            student.selectedColor === null;
           if (!isNullOrGrau) {
             return false;
           }
@@ -535,10 +535,12 @@ p {
 /* Zeilenfarben (Highlight) */
 .rowgreen {
   background-color: #009641e2 !important;
+  color: white;
 }
 
 .rowyellow {
   background-color: #ffc107e2 !important;
+  color: white;
 }
 
 .rowred {
