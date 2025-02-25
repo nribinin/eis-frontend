@@ -10,22 +10,22 @@
         <table class="modern-table">
           <thead class="modern-thead">
             <tr>
-              <th class="col">
+              <th>
                 <div class="icontext">
                   <i class="material-icons">school</i> Gegenstand
                 </div>
               </th>
-              <th class="col">
+              <th>
                 <div class="icontext">
                   <i class="material-icons">person</i> Lehrer
                 </div>
               </th>
-              <th class="col">
+              <th>
                 <div class="icontext">
                   <i class="material-icons">insert_invitation</i> Datum
                 </div>
               </th>
-              <th class="col">
+              <th>
                 <div class="icontext">
                   <i class="material-icons">subject</i> Anmerkung
                 </div>
@@ -42,9 +42,9 @@
                   { 'selected-group': expandedGroups.includes(index) }
                 ]"
                 @click="toggleGroup(index)"
+                data-label="Gruppe"
               >
                 <td>
-                  <!-- Icon und Label zur Kennzeichnung von Gruppierungen -->
                   <i class="material-icons group-icon">
                     {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
                   </i>
@@ -84,10 +84,10 @@
                   :key="subject.ampelId"
                   :class="['data-row', getRowClass(subject), 'child-row']"
                 >
-                  <td>{{ subject.subjectLangbezeichnung }}</td>
-                  <td>{{ subject.teacherName }}</td>
-                  <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
-                  <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
+                  <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
+                  <td data-label="Lehrer">{{ subject.teacherName }}</td>
+                  <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
+                  <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
                 </tr>
               </template>
             </template>
@@ -96,10 +96,10 @@
               :key="subject.ampelId"
               :class="['data-row', getRowClass(subject)]"
             >
-              <td>{{ subject.subjectLangbezeichnung }}</td>
-              <td>{{ subject.teacherName }}</td>
-              <td>{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
-              <td>{{ subject.bemerkung || "Keine Bemerkung" }}</td>
+              <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
+              <td data-label="Lehrer">{{ subject.teacherName }}</td>
+              <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
+              <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
             </tr>
           </tbody>
         </table>
@@ -114,7 +114,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 const snackbar = useSnackbarStore();
- import testdata from "@/assets/testdaten.json";
+import testdata from "@/assets/testdaten.json";
 
 interface Subject {
   ampelId: number;
@@ -137,10 +137,10 @@ const expandedGroups = ref<number[]>([]);
 
 const fetchSubjects = async () => {
   try {
-    const response = await axios.get("/student-ampel/getSchueler");
-    subjectList.value = response.data;
-    // Für Testdaten: 
-    //subjectList.value = testdata;
+    // const response = await axios.get("/student-ampel/getSchueler");
+    // subjectList.value = response.data;
+    // Für Testdaten:
+    subjectList.value = testdata;
   } catch (error) {
     snackbar.push(
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
@@ -217,37 +217,41 @@ onMounted(fetchSubjects);
 </script>
 
 <style scoped>
-/* Container mit modernem Hintergrund, abgerundeten Ecken und Schatten */
+/* Container mit grauem Gradient (wie vorher) */
 .modern-container {
-  padding: 20px;
-  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  transition: background 0.5s;
 }
 
-/* Wrapper für vertikales Scrollen */
+/* Vertikaler Scroll-Container */
 .table-vertical-scroll {
-  max-height: 70vh; /* Passt die Höhe je nach Bedarf an */
+  max-height: 70vh;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* für flüssiges Scrollen auf iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Modernes Tabellendesign */
+/* Tabelle & Header */
 .modern-table {
-  border-radius: 10px;
   width: 100%;
-  border-collapse: separate; /* oder collapse, je nach gewünschtem Effekt */
-  background: #ffffff;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 }
-
-/* Tabellenkopf mit Farbverlauf */
+.modern-table:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  
+}
 .modern-thead {
   background: linear-gradient(90deg, #4b79a1, #283e51);
   color: #fff;
 }
-
 .modern-thead th {
   padding: 15px;
   text-align: left;
@@ -255,108 +259,81 @@ onMounted(fetchSubjects);
   font-size: 1.1em;
 }
 
-/* Allgemeine Zellgestaltung */
 th,
 td {
   padding: 15px 20px;
   border: none;
-  border-radius: 0;
-  margin: 0;
-  list-style: none;
 }
 
-/* Zeilenstile und Hover-Effekte */
+/* Übergänge für Zeilen */
 .data-row,
 .group-row {
-  transition: background-color 0.3s, transform 0.3s;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
-
-.data-row:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  transform: scale(1.01);
-}
-
-.group-row {
-  font-weight: bold;
-}
-
+.data-row:hover,
 .group-row:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  transform: scale(1.01);
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  transform: scale(1.02);
 }
 
-/* Farbeffekte für die Zeilen */
+/* Neue, schönere Farbtöne */
 .rowgreen {
-  background-color: #009640 !important;
+  background-color: #388e3c !important;  /* edles Grün */
   color: #fff;
 }
-
 .rowyellow {
-  background-color: #ffc107 !important;
-  color: #333;
+  background-color: #fbc02d !important;  /* warmes Gelb */
+  color: #000;
 }
-
 .rowred {
-  background-color: #e30613 !important;
+  background-color: #d32f2f !important;   /* klassisches Rot */
   color: #fff;
 }
-
 .rowblack {
-  background-color: #000 !important;
+  background-color: #212121 !important;   /* dunkles Grau */
   color: #fff;
 }
 
-/* Border für ausgeklappte Gruppen */
 .selected-group {
-  border: 1px solid #007bff;
-  border-radius: 4px;
+  border: 2px solid #007bff;
+  border-radius: 5px;
 }
 
-/* Einrückung und Border für ausgeklappte Kindzeilen */
 .child-row td:first-child {
-  padding-left: 170px;
+  padding-left: 50px;
 }
 
-.child-row {
-  border-left: 3px solid #007bff;
-}
-
-/* Styling für Gruppenkennzeichnung */
 .group-icon {
-  font-size: 20px;
+  font-size: 22px;
   vertical-align: middle;
   margin-right: 5px;
-  opacity: 0.8;
+  opacity: 0.9;
 }
-
 .group-label {
-  background-color: rgba(0, 123, 255, 0.2);
+  background: rgba(0, 123, 255, 0.2);
   color: #007bff;
-  border-radius: 3px;
-  padding: 2px 4px;
-  margin-right: 5px;
-  font-size: 0.8em;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 8px;
+  font-size: 0.85em;
 }
-
-/* Styling für Icon und Text im Header */
 .icontext {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .dropdown-icon {
-  width: 18px;
+  width: 20px;
   margin-left: 10px;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
-
 .group-row:hover .dropdown-icon {
   transform: scale(1.1);
 }
 
-/* Meldung bei fehlenden Daten */
 .no-data-message {
   text-align: center;
   font-size: 1.5em;
@@ -364,15 +341,60 @@ td {
   color: #555;
 }
 
-/* Responsive Anpassungen */
+/* Responsive Anpassungen für Mobile */
 @media (max-width: 768px) {
-  .modern-thead th,
-  td {
-    padding: 10px;
-    font-size: 0.9rem;
+  /* Alle Tabellenelemente als Block anzeigen */
+  .modern-table,
+  .modern-thead,
+  .modern-table tbody,
+  .modern-table tr,
+  .modern-table th,
+  .modern-table td {
+    display: block;
   }
-  .icontext {
-    font-size: 0.9rem;
+  .modern-thead {
+    display: none;
+  }
+  /* Für ausgeklappte Data-Entries: Label fixiert links, Inhalt rechtsbündig */
+  .data-row td {
+    position: relative;
+    padding: 12px 15px 12px 120px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+  }
+  .data-row td:before {
+    position: absolute;
+    left: 15px;
+    top: 12px;
+    width: 90px;
+    font-weight: bold;
+    white-space: nowrap;
+    /* Labelfarbe übernimmt nun die Textfarbe */
+    color: inherit;
+    text-align: left;
+  }
+  .data-row td[data-label="Gegenstand"]:before {
+    content: "Gegenstand:";
+  }
+  .data-row td[data-label="Lehrer"]:before {
+    content: "Lehrer:";
+  }
+  .data-row td[data-label="Datum"]:before {
+    content: "Datum:";
+  }
+  .data-row td[data-label="Anmerkung"]:before {
+    content: "Anmerkung:";
+  }
+  /* Gruppierte Zeilen bleiben linksbündig ohne reservierten Label-Bereich */
+  .group-row td {
+    padding-left: 15px !important;
+    text-align: left;
+  }
+  .group-row td:before {
+    display: none;
+  }
+  .modern-container {
+    padding: 15px;
   }
 }
 </style>
