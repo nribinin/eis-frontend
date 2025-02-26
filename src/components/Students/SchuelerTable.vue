@@ -43,20 +43,21 @@
                 @click="toggleGroup(index)"
                 data-label="Gruppe"
               >
-                <td>
+                <td style="padding-left: 40px;">
                   <i class="material-icons group-icon">
                     {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
                   </i>
-                  <span class="group-label">Gruppe</span>
+                  
                   {{ group[0].subjectLangbezeichnung }}
+                  <!-- Für Gruppen mit schwarzer oder grüner Kennzeichnung werden weiße Pfeile genutzt -->
                   <img
-                    v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
+                    v-if="(getGroupRowClass(group) === 'rowblack' || getGroupRowClass(group) === 'rowgreen') && !expandedGroups.includes(index)"
                     src="@/assets/arrowDown_White.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
                   />
                   <img
-                    v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
+                    v-else-if="(getGroupRowClass(group) === 'rowblack' || getGroupRowClass(group) === 'rowgreen') && expandedGroups.includes(index)"
                     src="@/assets/arrowUp_White.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
@@ -68,7 +69,7 @@
                     class="dropdown-icon"
                   />
                   <img
-                    v-else-if="expandedGroups.includes(index)"
+                    v-else
                     src="@/assets/arrowUp.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
@@ -82,7 +83,7 @@
                   :key="subject.ampelId"
                   :class="['data-row', getRowClass(subject), 'child-row']"
                 >
-                  <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
+                  <td data-label="Gegenstand" >{{ subject.subjectLangbezeichnung }}</td>
                   <td data-label="Lehrer">{{ subject.teacherName }}</td>
                   <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
                   <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
@@ -94,7 +95,7 @@
               :key="subject.ampelId"
               :class="['data-row', getRowClass(subject)]"
             >
-              <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
+              <td data-label="Gegenstand" style="padding-left: 70px;">{{ subject.subjectLangbezeichnung }}</td>
               <td data-label="Lehrer">{{ subject.teacherName }}</td>
               <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
               <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
@@ -115,7 +116,7 @@
           <div class="card-header" @click="toggleGroup(index)">
             <span class="card-title">Gruppe: {{ group[0].subjectLangbezeichnung }}</span>
             <i class="material-icons toggle-icon">
-              {{ expandedGroups.includes(index) ? 'expand_less' : 'expand_more' }}
+              {{ expandedGroups.includes(index) ? "expand_less" : "expand_more" }}
             </i>
           </div>
           <transition name="slide-fade">
@@ -137,11 +138,15 @@
                   </div>
                   <div class="card-detail-row">
                     <span class="card-label">Datum:</span>
-                    <span class="card-value">{{ formatDate(subject.updatedAt) || 'Kein Datum' }}</span>
+                    <span class="card-value">
+                      {{ formatDate(subject.updatedAt) || "Kein Datum" }}
+                    </span>
                   </div>
                   <div class="card-detail-row">
                     <span class="card-label">Anmerkung:</span>
-                    <span class="card-value">{{ subject.bemerkung || 'Keine Bemerkung' }}</span>
+                    <span class="card-value">
+                      {{ subject.bemerkung || "Keine Bemerkung" }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -159,7 +164,7 @@
           <div class="card-header" @click="toggleSingle(subject.ampelId)">
             <span class="card-title">{{ subject.subjectLangbezeichnung }}</span>
             <i class="material-icons toggle-icon">
-              {{ expandedSingles.has(subject.ampelId) ? 'expand_less' : 'expand_more' }}
+              {{ expandedSingles.has(subject.ampelId) ? "expand_less" : "expand_more" }}
             </i>
           </div>
           <transition name="slide-fade">
@@ -173,11 +178,15 @@
                   </div>
                   <div class="card-detail-row">
                     <span class="card-label">Datum:</span>
-                    <span class="card-value">{{ formatDate(subject.updatedAt) || 'Kein Datum' }}</span>
+                    <span class="card-value">
+                      {{ formatDate(subject.updatedAt) || "Kein Datum" }}
+                    </span>
                   </div>
                   <div class="card-detail-row">
                     <span class="card-label">Anmerkung:</span>
-                    <span class="card-value">{{ subject.bemerkung || 'Keine Bemerkung' }}</span>
+                    <span class="card-value">
+                      {{ subject.bemerkung || "Keine Bemerkung" }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -190,10 +199,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
-import { format } from 'date-fns';
-import testdata from '@/assets/testdaten.json';
-import { useSnackbarStore } from '@/stores/SnackbarStore.ts';
+import { ref, computed, onMounted } from "vue";
+import { format } from "date-fns";
+import testdata from "@/assets/testdaten.json";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+import axios from "axios";
 const snackbar = useSnackbarStore();
 
 interface Subject {
@@ -220,26 +230,32 @@ const isMobile = ref(window.innerWidth < 768);
 const updateIsMobile = () => {
   isMobile.value = window.innerWidth < 768;
 };
-window.addEventListener('resize', updateIsMobile);
+window.addEventListener("resize", updateIsMobile);
 
 const fetchSubjects = async () => {
   try {
     // Bei echten Daten: axios.get(...);
-    subjectList.value = testdata;
+    //subjectList.value = testdata;
+    const response = await axios.get("/student-ampel/getSchueler");
+    subjectList.value = response.data;
   } catch (error) {
-    snackbar.push("Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!");
+    snackbar.push(
+      "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
+    );
   }
 };
 
 const filteredSubjects = computed(() => {
-  return subjectList.value.filter(subject => 
-    subject.farbe && subject.farbe.toUpperCase() !== "GRAU"
+  return subjectList.value.filter(
+    (subject) => subject.farbe && subject.farbe.toUpperCase() !== "GRAU"
   );
 });
 
 const groupedSubjectList = computed(() => {
   const grouped = filteredSubjects.value.reduce((acc: Subject[][], subject) => {
-    const group = acc.find(g => g[0].subjectLangbezeichnung === subject.subjectLangbezeichnung);
+    const group = acc.find(
+      (g) => g[0].subjectLangbezeichnung === subject.subjectLangbezeichnung
+    );
     if (group) {
       group.push(subject);
     } else {
@@ -247,21 +263,21 @@ const groupedSubjectList = computed(() => {
     }
     return acc;
   }, []);
-  return grouped.filter(group => group.length > 1);
+  return grouped.filter((group) => group.length > 1);
 });
 
 const singleSubjectList = computed(() => {
   const groupedSubjects = groupedSubjectList.value
     .flat()
-    .map(entry => entry.subjectLangbezeichnung);
+    .map((entry) => entry.subjectLangbezeichnung);
   return filteredSubjects.value.filter(
-    subject => !groupedSubjects.includes(subject.subjectLangbezeichnung)
+    (subject) => !groupedSubjects.includes(subject.subjectLangbezeichnung)
   );
 });
 
 const toggleGroup = (index: number) => {
   if (expandedGroups.value.includes(index)) {
-    expandedGroups.value = expandedGroups.value.filter(i => i !== index);
+    expandedGroups.value = expandedGroups.value.filter((i) => i !== index);
   } else {
     expandedGroups.value.push(index);
   }
@@ -279,17 +295,22 @@ const toggleSingle = (ampelId: number) => {
 
 const getRowClass = (subject: Subject) => {
   const farbe = subject.farbe.toUpperCase();
-  switch(farbe) {
-    case "GRUEN": return "rowgreen";
-    case "GELB": return "rowyellow";
-    case "ROT": return "rowred";
-    case "SCHWARZ": return "rowblack";
-    default: return "";
+  switch (farbe) {
+    case "GRUEN":
+      return "rowgreen";
+    case "GELB":
+      return "rowyellow";
+    case "ROT":
+      return "rowred";
+    case "SCHWARZ":
+      return "rowblack";
+    default:
+      return "";
   }
 };
 
 const getGroupRowClass = (group: Subject[]) => {
-  const colors = group.map(item => item.farbe.toUpperCase());
+  const colors = group.map((item) => item.farbe.toUpperCase());
   if (colors.includes("SCHWARZ")) return "rowblack";
   if (colors.includes("ROT")) return "rowred";
   if (colors.includes("GELB")) return "rowyellow";
@@ -311,14 +332,15 @@ onMounted(fetchSubjects);
   padding: 30px;
   background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
   border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   transition: background 0.5s;
 }
 
 /* Desktop-Tabelle */
+/* Tabelle nimmt jetzt die volle Screenhöhe ein */
 .table-vertical-scroll {
-  max-height: 70vh;
+  height: 100vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -328,23 +350,24 @@ onMounted(fetchSubjects);
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 }
 .modern-table:hover {
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 .modern-thead {
   background: linear-gradient(90deg, #4b79a1, #283e51);
   color: #fff;
 }
 .modern-thead th {
-  padding: 15px;
+  padding: 25px;
   text-align: left;
   font-weight: 600;
   font-size: 1.1em;
 }
-th, td {
+th,
+td {
   padding: 15px 20px;
   border: none;
 }
@@ -355,9 +378,9 @@ th, td {
 }
 .data-row:hover,
 .group-row:hover {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(0, 0, 0, 0.05);
   transform: scale(1.02);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Farbliche Markierungen (Desktop) */
@@ -381,22 +404,16 @@ th, td {
   border: 2px solid #007bff;
   border-radius: 5px;
 }
-/* Für die Child-Rows in der Gruppenansicht (Desktop):
-   Der erste TD erhält hier den farbigen linken Rand */
+/* Child-Rows einrücken (Desktop):
+   Der erste TD der Child-Rows erhält nun 50px mehr Padding */
 .child-row td:first-child {
-  padding-left: 50px;
+  padding-left: 100px;
 }
-.child-row.rowgreen td:first-child {
-  padding-left: 12px;
-}
-.child-row.rowyellow td:first-child {
-  padding-left: 12px;
-}
-.child-row.rowred td:first-child {
-  padding-left: 12px;
-}
+.child-row.rowgreen td:first-child,
+.child-row.rowyellow td:first-child,
+.child-row.rowred td:first-child,
 .child-row.rowblack td:first-child {
-  padding-left: 12px;
+  padding-left: 162px;
 }
 
 .group-icon {
@@ -406,7 +423,7 @@ th, td {
   opacity: 0.9;
 }
 .group-label {
-  background: rgba(0,123,255,0.2);
+  background: rgba(0, 123, 255, 0.2);
   color: #007bff;
   border-radius: 4px;
   padding: 2px 6px;
@@ -443,15 +460,13 @@ th, td {
 .card {
   background: #fff;
   border-radius: 8px;
-  /* Standardmäßig: linker Rand zeigt die Ampelfarbe */
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .card:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-/* Card-Header: Weißer Hintergrund, schwarze Schrift für guten Kontrast */
 .card-header {
   padding: 12px 15px;
   background: #fff;
@@ -479,20 +494,30 @@ th, td {
 .card-value {
   text-align: right;
 }
-/* Linker farblicher Rand (Ampelfarbe) für Cards */
-.rowgreen.card { border-left: 8px solid #388e3c; }
-.rowyellow.card { border-left: 8px solid #fbc02d; }
-.rowred.card { border-left: 8px solid #d32f2f; }
-.rowblack.card { border-left: 8px solid #212121; }
-
-/* Linker farblicher Rand (Ampelfarbe) für inner cards */
-.inner-card.rowgreen { border-left: 8px solid #388e3c; }
-.inner-card.rowyellow { border-left: 8px solid #fbc02d; }
-.inner-card.rowred   { border-left: 8px solid #d32f2f; }
-.inner-card.rowblack { border-left: 8px solid #212121; }
-
-/* Wichtig: Für mobile Ansichten soll der Hintergrund der Cards und inner cards
-   trotz vorhandener row*-Klasse weiß bleiben – nur der linke Rand zeigt die Farbe */
+.rowgreen.card {
+  border-left: 8px solid #388e3c;
+}
+.rowyellow.card {
+  border-left: 8px solid #fbc02d;
+}
+.rowred.card {
+  border-left: 8px solid #d32f2f;
+}
+.rowblack.card {
+  border-left: 8px solid #212121;
+}
+.inner-card.rowgreen {
+  border-left: 8px solid #388e3c;
+}
+.inner-card.rowyellow {
+  border-left: 8px solid #fbc02d;
+}
+.inner-card.rowred {
+  border-left: 8px solid #d32f2f;
+}
+.inner-card.rowblack {
+  border-left: 8px solid #212121;
+}
 .mobile-card-container .card.rowgreen,
 .mobile-card-container .card.rowyellow,
 .mobile-card-container .card.rowred,
@@ -501,15 +526,12 @@ th, td {
 .mobile-card-container .inner-card.rowyellow,
 .mobile-card-container .inner-card.rowred,
 .mobile-card-container .inner-card.rowblack {
-   background-color: #fff !important;
-   color: inherit !important;
+  background-color: #fff !important;
+  color: inherit !important;
 }
-
 .toggle-icon {
   font-size: 1.5em;
 }
-
-/* Inner Cards (für gruppierte Einträge) */
 .inner-card {
   background: #fff;
   border: 1px solid #eee;
@@ -528,12 +550,12 @@ th, td {
   font-size: 0.95em;
   margin-top: 5px;
 }
-
-/* Transition für Ein-/Ausblenden */
-.slide-fade-enter-active, .slide-fade-leave-active {
+.slide-fade-enter-active,
+.slide-fade-leave-active {
   transition: all 0.3s ease;
 }
-.slide-fade-enter-from, .slide-fade-leave-to {
+.slide-fade-enter-from,
+.slide-fade-leave-to {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
