@@ -129,4 +129,46 @@ h3 {
     height: 10vh !important;
   }
 }
+@media screen and (max-width: 600px) {
+  h3 {
+    display: none;
+  }
+
+  nav ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5em;
+    height: 5em !important;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
+  }
+
+  .choose {
+    padding: 0.7em 0.7em;
+  }
+
+  .logout {
+    height: 5em !important;
+    display: flex;
+  align-items: center;
+    margin: 0 !important;
+    float: right;
+  }
+
+  .material-icons {
+    font-size: 2em;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  nav{
+    background-color: black;
+    height: 4em !important;
+  }
+}
 </style>

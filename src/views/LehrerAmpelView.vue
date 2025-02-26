@@ -142,20 +142,40 @@ h3 {
   }
 
   nav ul {
-    flex-direction: column;
-    gap: 0.3em;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5em;
+    height: 5em !important;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
   }
 
   .choose {
-    width: 100%;
+    padding: 0.7em 0.7em;
   }
 
   .logout {
-    width: 100%;
-    margin: 0;
+    height: 5em !important;
+    display: flex;
+  align-items: center;
+    margin: 0 !important;
+    float: right;
   }
-  li {
-    font-size: 1em;
+
+  .material-icons {
+    font-size: 2em;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  nav{
+    background-color: black;
+    height: 4em !important;
   }
 }
 </style>
