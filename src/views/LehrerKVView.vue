@@ -120,15 +120,18 @@ h3 {
 
 @media screen and (max-width: 900px) {
   h3 {
-    font-size: 1em !important;
+    font-size: 2em !important;
   }
+
   nav {
     height: 10vh !important;
   }
+
   ul {
     height: 10vh !important;
   }
 }
+
 @media screen and (max-width: 600px) {
   h3 {
     display: none;
@@ -137,9 +140,19 @@ h3 {
   nav ul {
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 0.5em;
-    height: 5em !important;
+    height: 4em !important;
+    background-color: black !important;
+  }
+
+  ul {
+    height: 4em !important;
+  }
+
+  li {
+    height: 4em !important;
+    display: flex;
+    align-items: center;
   }
 
   .nav-links {
@@ -153,10 +166,12 @@ h3 {
   }
 
   .logout {
-    height: 5em !important;
+    height: 4em !important;
     display: flex;
-  align-items: center;
+    align-items: center;
     margin: 0 !important;
+    margin-left: 0.5em !important;
+    margin-right: 0.5em !important;
     float: right;
   }
 
@@ -166,9 +181,14 @@ h3 {
 }
 
 @media screen and (max-width: 450px) {
-  nav{
-    background-color: black;
+  nav {
+    background-color: black !important;
     height: 4em !important;
+  }
+
+  ul {
+    background-color: black !important;
+    height: 3em !important;
   }
 }
 </style>
