@@ -1,12 +1,11 @@
-<!-- SchuelerTable.vue -->
 <template>
   <div class="schuelerTable modern-container">
     <template v-if="subjectList.length === 0">
       <p class="no-data-message">Kein Lehrer hat dich noch bewertet</p>
     </template>
     <template v-else>
-      <!-- Wrapper für vertikales Scrollen -->
-      <div class="table-vertical-scroll">
+      <!-- Desktop-Ansicht: klassische Tabelle -->
+      <div v-if="!isMobile" class="table-vertical-scroll">
         <table class="modern-table">
           <thead class="modern-thead">
             <tr>
@@ -44,21 +43,21 @@
                 @click="toggleGroup(index)"
                 data-label="Gruppe"
               >
-                <td>
+                <td style="padding-left: 40px;">
                   <i class="material-icons group-icon">
                     {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
                   </i>
-                  <span class="group-label">Gruppe</span>
+                  
                   {{ group[0].subjectLangbezeichnung }}
-                  <!-- Dropdown-Icons -->
+                  <!-- Für Gruppen mit schwarzer oder grüner Kennzeichnung werden weiße Pfeile genutzt -->
                   <img
-                    v-if="getGroupRowClass(group) === 'rowblack' && !expandedGroups.includes(index)"
+                    v-if="(getGroupRowClass(group) === 'rowblack' || getGroupRowClass(group) === 'rowgreen') && !expandedGroups.includes(index)"
                     src="@/assets/arrowDown_White.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
                   />
                   <img
-                    v-if="getGroupRowClass(group) === 'rowblack' && expandedGroups.includes(index)"
+                    v-else-if="(getGroupRowClass(group) === 'rowblack' || getGroupRowClass(group) === 'rowgreen') && expandedGroups.includes(index)"
                     src="@/assets/arrowUp_White.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
@@ -70,7 +69,7 @@
                     class="dropdown-icon"
                   />
                   <img
-                    v-else-if="expandedGroups.includes(index)"
+                    v-else
                     src="@/assets/arrowUp.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
@@ -84,7 +83,7 @@
                   :key="subject.ampelId"
                   :class="['data-row', getRowClass(subject), 'child-row']"
                 >
-                  <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
+                  <td data-label="Gegenstand" >{{ subject.subjectLangbezeichnung }}</td>
                   <td data-label="Lehrer">{{ subject.teacherName }}</td>
                   <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
                   <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
@@ -96,7 +95,7 @@
               :key="subject.ampelId"
               :class="['data-row', getRowClass(subject)]"
             >
-              <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
+              <td data-label="Gegenstand" style="padding-left: 70px;">{{ subject.subjectLangbezeichnung }}</td>
               <td data-label="Lehrer">{{ subject.teacherName }}</td>
               <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
               <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
@@ -104,17 +103,108 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Mobile-Ansicht: Cards -->
+      <div v-else class="mobile-card-container">
+        <!-- Gruppierte Fächer als einklappbare Cards mit eigenen Inner-Cards -->
+        <div
+          v-for="(group, index) in groupedSubjectList"
+          :key="index"
+          class="card card-group"
+          :class="getGroupRowClass(group)"
+        >
+          <div class="card-header" @click="toggleGroup(index)">
+            <span class="card-title">Gruppe: {{ group[0].subjectLangbezeichnung }}</span>
+            <i class="material-icons toggle-icon">
+              {{ expandedGroups.includes(index) ? "expand_less" : "expand_more" }}
+            </i>
+          </div>
+          <transition name="slide-fade">
+            <div v-if="expandedGroups.includes(index)" class="card-body">
+              <!-- Jeder Eintrag innerhalb der Gruppe als eigene Inner-Card -->
+              <div
+                v-for="subject in group"
+                :key="subject.ampelId"
+                class="inner-card"
+                :class="getRowClass(subject)"
+              >
+                <div class="inner-card-header">
+                  {{ subject.subjectLangbezeichnung }}
+                </div>
+                <div class="inner-card-body">
+                  <div class="card-detail-row">
+                    <span class="card-label">Lehrer:</span>
+                    <span class="card-value">{{ subject.teacherName }}</span>
+                  </div>
+                  <div class="card-detail-row">
+                    <span class="card-label">Datum:</span>
+                    <span class="card-value">
+                      {{ formatDate(subject.updatedAt) || "Kein Datum" }}
+                    </span>
+                  </div>
+                  <div class="card-detail-row">
+                    <span class="card-label">Anmerkung:</span>
+                    <span class="card-value">
+                      {{ subject.bemerkung || "Keine Bemerkung" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
+
+        <!-- Einzelne Fächer als einklappbare Cards mit eigener Inner-Card -->
+        <div
+          v-for="subject in singleSubjectList"
+          :key="subject.ampelId"
+          class="card single-card"
+          :class="getRowClass(subject)"
+        >
+          <div class="card-header" @click="toggleSingle(subject.ampelId)">
+            <span class="card-title">{{ subject.subjectLangbezeichnung }}</span>
+            <i class="material-icons toggle-icon">
+              {{ expandedSingles.has(subject.ampelId) ? "expand_less" : "expand_more" }}
+            </i>
+          </div>
+          <transition name="slide-fade">
+            <div v-if="expandedSingles.has(subject.ampelId)" class="card-body">
+              <div class="inner-card">
+                <div class="inner-card-header">Details</div>
+                <div class="inner-card-body">
+                  <div class="card-detail-row">
+                    <span class="card-label">Lehrer:</span>
+                    <span class="card-value">{{ subject.teacherName }}</span>
+                  </div>
+                  <div class="card-detail-row">
+                    <span class="card-label">Datum:</span>
+                    <span class="card-value">
+                      {{ formatDate(subject.updatedAt) || "Kein Datum" }}
+                    </span>
+                  </div>
+                  <div class="card-detail-row">
+                    <span class="card-label">Anmerkung:</span>
+                    <span class="card-value">
+                      {{ subject.bemerkung || "Keine Bemerkung" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
+      </div>
     </template>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
 import { format } from "date-fns";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 import testdata from "@/assets/testdaten.json";
+import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
+import axios from "axios";
+const snackbar = useSnackbarStore();
 
 interface Subject {
   ampelId: number;
@@ -134,13 +224,20 @@ interface Subject {
 
 const subjectList = ref<Subject[]>([]);
 const expandedGroups = ref<number[]>([]);
+const expandedSingles = ref<Set<number>>(new Set());
+const isMobile = ref(window.innerWidth < 768);
+
+const updateIsMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+window.addEventListener("resize", updateIsMobile);
 
 const fetchSubjects = async () => {
   try {
-    // const response = await axios.get("/student-ampel/getSchueler");
-    // subjectList.value = response.data;
-    // Für Testdaten:
-    subjectList.value = testdata;
+    // Bei echten Daten: axios.get(...);
+    //subjectList.value = testdata;
+    const response = await axios.get("/student-ampel/getSchueler");
+    subjectList.value = response.data;
   } catch (error) {
     snackbar.push(
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
@@ -149,7 +246,9 @@ const fetchSubjects = async () => {
 };
 
 const filteredSubjects = computed(() => {
-  return subjectList.value.filter((subject) => subject.farbe !== "GRAU");
+  return subjectList.value.filter(
+    (subject) => subject.farbe && subject.farbe.toUpperCase() !== "GRAU"
+  );
 });
 
 const groupedSubjectList = computed(() => {
@@ -184,8 +283,19 @@ const toggleGroup = (index: number) => {
   }
 };
 
+const toggleSingle = (ampelId: number) => {
+  const newSet = new Set(expandedSingles.value);
+  if (newSet.has(ampelId)) {
+    newSet.delete(ampelId);
+  } else {
+    newSet.add(ampelId);
+  }
+  expandedSingles.value = newSet;
+};
+
 const getRowClass = (subject: Subject) => {
-  switch (subject.farbe) {
+  const farbe = subject.farbe.toUpperCase();
+  switch (farbe) {
     case "GRUEN":
       return "rowgreen";
     case "GELB":
@@ -200,7 +310,7 @@ const getRowClass = (subject: Subject) => {
 };
 
 const getGroupRowClass = (group: Subject[]) => {
-  const colors = group.map((item) => item.farbe);
+  const colors = group.map((item) => item.farbe.toUpperCase());
   if (colors.includes("SCHWARZ")) return "rowblack";
   if (colors.includes("ROT")) return "rowred";
   if (colors.includes("GELB")) return "rowyellow";
@@ -217,24 +327,23 @@ onMounted(fetchSubjects);
 </script>
 
 <style scoped>
-/* Container mit grauem Gradient (wie vorher) */
+/* Allgemeine Container-Styles */
 .modern-container {
   padding: 30px;
   background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   transition: background 0.5s;
 }
 
-/* Vertikaler Scroll-Container */
+/* Desktop-Tabelle */
+/* Tabelle nimmt jetzt die volle Screenhöhe ein */
 .table-vertical-scroll {
-  max-height: 70vh;
+  height: 100vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
-
-/* Tabelle & Header */
 .modern-table {
   width: 100%;
   border-collapse: collapse;
@@ -246,26 +355,22 @@ onMounted(fetchSubjects);
 }
 .modern-table:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  
 }
 .modern-thead {
   background: linear-gradient(90deg, #4b79a1, #283e51);
   color: #fff;
 }
 .modern-thead th {
-  padding: 15px;
+  padding: 25px;
   text-align: left;
   font-weight: 600;
   font-size: 1.1em;
 }
-
 th,
 td {
   padding: 15px 20px;
   border: none;
 }
-
-/* Übergänge für Zeilen */
 .data-row,
 .group-row {
   transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
@@ -274,36 +379,41 @@ td {
 .data-row:hover,
 .group-row:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Neue, schönere Farbtöne */
+/* Farbliche Markierungen (Desktop) */
 .rowgreen {
-  background-color: #388e3c !important;  /* edles Grün */
+  background-color: #388e3c !important;
   color: #fff;
 }
 .rowyellow {
-  background-color: #fbc02d !important;  /* warmes Gelb */
+  background-color: #fbc02d !important;
   color: #000;
 }
 .rowred {
-  background-color: #d32f2f !important;   /* klassisches Rot */
+  background-color: #d32f2f !important;
   color: #fff;
 }
 .rowblack {
-  background-color: #212121 !important;   /* dunkles Grau */
+  background-color: #212121 !important;
   color: #fff;
 }
-
 .selected-group {
   border: 2px solid #007bff;
   border-radius: 5px;
 }
-
+/* Child-Rows einrücken (Desktop):
+   Der erste TD der Child-Rows erhält nun 50px mehr Padding */
 .child-row td:first-child {
-  padding-left: 50px;
+  padding-left: 100px;
+}
+.child-row.rowgreen td:first-child,
+.child-row.rowyellow td:first-child,
+.child-row.rowred td:first-child,
+.child-row.rowblack td:first-child {
+  padding-left: 162px;
 }
 
 .group-icon {
@@ -333,7 +443,6 @@ td {
 .group-row:hover .dropdown-icon {
   transform: scale(1.1);
 }
-
 .no-data-message {
   text-align: center;
   font-size: 1.5em;
@@ -341,60 +450,114 @@ td {
   color: #555;
 }
 
-/* Responsive Anpassungen für Mobile */
-@media (max-width: 768px) {
-  /* Alle Tabellenelemente als Block anzeigen */
-  .modern-table,
-  .modern-thead,
-  .modern-table tbody,
-  .modern-table tr,
-  .modern-table th,
-  .modern-table td {
-    display: block;
-  }
-  .modern-thead {
-    display: none;
-  }
-  /* Für ausgeklappte Data-Entries: Label fixiert links, Inhalt rechtsbündig */
-  .data-row td {
-    position: relative;
-    padding: 12px 15px 12px 120px;
-    text-align: right;
-    border-bottom: 1px solid #eee;
-  }
-  .data-row td:before {
-    position: absolute;
-    left: 15px;
-    top: 12px;
-    width: 90px;
-    font-weight: bold;
-    white-space: nowrap;
-    /* Labelfarbe übernimmt nun die Textfarbe */
-    color: inherit;
-    text-align: left;
-  }
-  .data-row td[data-label="Gegenstand"]:before {
-    content: "Gegenstand:";
-  }
-  .data-row td[data-label="Lehrer"]:before {
-    content: "Lehrer:";
-  }
-  .data-row td[data-label="Datum"]:before {
-    content: "Datum:";
-  }
-  .data-row td[data-label="Anmerkung"]:before {
-    content: "Anmerkung:";
-  }
-  /* Gruppierte Zeilen bleiben linksbündig ohne reservierten Label-Bereich */
-  .group-row td {
-    padding-left: 15px !important;
-    text-align: left;
-  }
-  .group-row td:before {
-    display: none;
-  }
-  .modern-container {
-    padding: 15px;
-  }
+/* Mobile Card-Ansicht */
+.mobile-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+}
+.card {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.card-header {
+  padding: 12px 15px;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+.card-body {
+  padding: 12px 15px;
+  background: #fff;
+  color: #000;
+}
+.card-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+.card-label {
+  font-weight: bold;
+}
+.card-value {
+  text-align: right;
+}
+.rowgreen.card {
+  border-left: 8px solid #388e3c;
+}
+.rowyellow.card {
+  border-left: 8px solid #fbc02d;
+}
+.rowred.card {
+  border-left: 8px solid #d32f2f;
+}
+.rowblack.card {
+  border-left: 8px solid #212121;
+}
+.inner-card.rowgreen {
+  border-left: 8px solid #388e3c;
+}
+.inner-card.rowyellow {
+  border-left: 8px solid #fbc02d;
+}
+.inner-card.rowred {
+  border-left: 8px solid #d32f2f;
+}
+.inner-card.rowblack {
+  border-left: 8px solid #212121;
+}
+.mobile-card-container .card.rowgreen,
+.mobile-card-container .card.rowyellow,
+.mobile-card-container .card.rowred,
+.mobile-card-container .card.rowblack,
+.mobile-card-container .inner-card.rowgreen,
+.mobile-card-container .inner-card.rowyellow,
+.mobile-card-container .inner-card.rowred,
+.mobile-card-container .inner-card.rowblack {
+  background-color: #fff !important;
+  color: inherit !important;
+}
+.toggle-icon {
+  font-size: 1.5em;
+}
+.inner-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+.inner-card-header {
+  font-weight: 600;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  font-size: 1em;
+}
+.inner-card-body {
+  font-size: 0.95em;
+  margin-top: 5px;
+}
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
 }
 </style>
