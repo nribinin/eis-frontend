@@ -15,9 +15,7 @@
                 </div>
               </th>
               <th>
-                <div class="icontext">
-                  <i class="material-icons">person</i> Lehrer
-                </div>
+                <div class="icontext"><i class="material-icons">person</i> Lehrer</div>
               </th>
               <th>
                 <div class="icontext">
@@ -38,26 +36,34 @@
                 :class="[
                   'group-row',
                   getGroupRowClass(group),
-                  { 'selected-group': expandedGroups.includes(index) }
+                  { 'selected-group': expandedGroups.includes(index) },
                 ]"
                 @click="toggleGroup(index)"
                 data-label="Gruppe"
               >
-                <td style="padding-left: 40px;">
+                <td style="padding-left: 40px">
                   <i class="material-icons group-icon">
                     {{ expandedGroups.includes(index) ? "folder_open" : "folder" }}
                   </i>
-                  
+
                   {{ group[0].subjectLangbezeichnung }}
                   <!-- Für Gruppen mit schwarzer oder grüner Kennzeichnung werden weiße Pfeile genutzt -->
                   <img
-                    v-if="(getGroupRowClass(group) === 'rowblack' || getGroupRowClass(group) === 'rowgreen') && !expandedGroups.includes(index)"
+                    v-if="
+                      (getGroupRowClass(group) === 'rowblack' ||
+                        getGroupRowClass(group) === 'rowgreen') &&
+                      !expandedGroups.includes(index)
+                    "
                     src="@/assets/arrowDown_White.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
                   />
                   <img
-                    v-else-if="(getGroupRowClass(group) === 'rowblack' || getGroupRowClass(group) === 'rowgreen') && expandedGroups.includes(index)"
+                    v-else-if="
+                      (getGroupRowClass(group) === 'rowblack' ||
+                        getGroupRowClass(group) === 'rowgreen') &&
+                      expandedGroups.includes(index)
+                    "
                     src="@/assets/arrowUp_White.png"
                     alt="dropdown icon"
                     class="dropdown-icon"
@@ -83,10 +89,14 @@
                   :key="subject.ampelId"
                   :class="['data-row', getRowClass(subject), 'child-row']"
                 >
-                  <td data-label="Gegenstand" >{{ subject.subjectLangbezeichnung }}</td>
+                  <td data-label="Gegenstand">{{ subject.subjectLangbezeichnung }}</td>
                   <td data-label="Lehrer">{{ subject.teacherName }}</td>
-                  <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
-                  <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
+                  <td data-label="Datum">
+                    {{ formatDate(subject.updatedAt) || "Kein Datum" }}
+                  </td>
+                  <td data-label="Anmerkung">
+                    {{ subject.bemerkung || "Keine Bemerkung" }}
+                  </td>
                 </tr>
               </template>
             </template>
@@ -95,9 +105,13 @@
               :key="subject.ampelId"
               :class="['data-row', getRowClass(subject)]"
             >
-              <td data-label="Gegenstand" style="padding-left: 70px;">{{ subject.subjectLangbezeichnung }}</td>
+              <td data-label="Gegenstand" style="padding-left: 70px">
+                {{ subject.subjectLangbezeichnung }}
+              </td>
               <td data-label="Lehrer">{{ subject.teacherName }}</td>
-              <td data-label="Datum">{{ formatDate(subject.updatedAt) || "Kein Datum" }}</td>
+              <td data-label="Datum">
+                {{ formatDate(subject.updatedAt) || "Kein Datum" }}
+              </td>
               <td data-label="Anmerkung">{{ subject.bemerkung || "Keine Bemerkung" }}</td>
             </tr>
           </tbody>
@@ -235,9 +249,9 @@ window.addEventListener("resize", updateIsMobile);
 const fetchSubjects = async () => {
   try {
     // Bei echten Daten: axios.get(...);
-    //subjectList.value = testdata;
-    const response = await axios.get("/student-ampel/getSchueler");
-    subjectList.value = response.data;
+    subjectList.value = testdata;
+    //const response = await axios.get("/student-ampel/getSchueler");
+    //subjectList.value = response.data;
   } catch (error) {
     snackbar.push(
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
@@ -334,7 +348,6 @@ onMounted(fetchSubjects);
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  transition: background 0.5s;
 }
 
 /* Desktop-Tabelle */
@@ -344,15 +357,15 @@ onMounted(fetchSubjects);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
 .modern-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 10px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
+  
 }
+
 .modern-table:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
@@ -370,18 +383,30 @@ th,
 td {
   padding: 15px 20px;
   border: none;
+  border-radius: 0;
+  list-style: none;
 }
 .data-row,
 .group-row {
   transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  
 }
+.data-row,
+.group-row,
+.card {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 .data-row:hover,
-.group-row:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  transform: scale(1.02);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
+  .group-row:hover,
+  .card:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px); /* sanfte Verschiebung */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  }
 
 /* Farbliche Markierungen (Desktop) */
 .rowgreen {
@@ -400,15 +425,19 @@ td {
   background-color: #212121 !important;
   color: #fff;
 }
-.selected-group {
-  border: 2px solid #007bff;
+/*.selected-group {
+  /*border: 2px solid #007bff;
   border-radius: 5px;
+  
 }
+*/
 /* Child-Rows einrücken (Desktop):
    Der erste TD der Child-Rows erhält nun 50px mehr Padding */
 .child-row td:first-child {
   padding-left: 100px;
 }
+
+
 .child-row.rowgreen td:first-child,
 .child-row.rowyellow td:first-child,
 .child-row.rowred td:first-child,
@@ -423,8 +452,8 @@ td {
   opacity: 0.9;
 }
 .group-label {
-  background: rgba(0, 123, 255, 0.2);
-  color: #007bff;
+  /*background: rgba(0, 123, 255, 0.2);
+  color: #007bff;*/
   border-radius: 4px;
   padding: 2px 6px;
   margin-right: 8px;
@@ -439,6 +468,9 @@ td {
   width: 20px;
   margin-left: 10px;
   transition: transform 0.3s ease;
+}
+.group-row {
+  font-weight: bold;
 }
 .group-row:hover .dropdown-icon {
   transform: scale(1.1);
@@ -559,5 +591,8 @@ td {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
+}
+tr{
+  border-bottom:
 }
 </style>
