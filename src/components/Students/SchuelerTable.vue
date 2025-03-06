@@ -249,9 +249,9 @@ window.addEventListener("resize", updateIsMobile);
 const fetchSubjects = async () => {
   try {
     // Bei echten Daten: axios.get(...);
-    subjectList.value = testdata;
-    //const response = await axios.get("/student-ampel/getSchueler");
-    //subjectList.value = response.data;
+    // subjectList.value = testdata;
+    const response = await axios.get("/student-ampel/getSchueler");
+    subjectList.value = response.data;
   } catch (error) {
     snackbar.push(
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"

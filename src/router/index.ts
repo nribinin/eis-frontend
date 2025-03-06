@@ -90,36 +90,42 @@ const router = createRouter({
   ],
 })
 
-router.beforeResolve((to, from, next) => {
-  const auth = useAuthenticationStore()
-  console.log(auth)
-  const snackbar = useSnackbarStore()
+router.beforeResolve(async (to, from, next) => {
+  const auth = useAuthenticationStore();
+  const snackbar = useSnackbarStore();
+
+  // Warten, bis auth geladen ist
+  if (!auth.loaded) {
+    
+  }
+
   if (to.name === "login" && auth.loggedIn) {
     if (auth.roles.includes(Roles.TEACHER)) {
-      return next({ name: "lehrer" })
+      return next({ name: "lehrer" });
     } else if (auth.roles.includes(Roles.STUDENT)) {
-      return next({ name: "schueler" })
+      return next({ name: "schueler" });
     }
   }
+
   if (
-    auth.loaded && // If Authentication is not loaded preferred to let navigation through and redirect later if first data call returns with 401 or 403.
     !auth.loggedIn &&
-    (to.meta?.authRequired == true ||
-      (to.meta?.role != undefined && Array.isArray(to.meta.role) && to.meta.role.length > 0))
+    (to.meta?.authRequired === true ||
+      (to.meta?.role && Array.isArray(to.meta.role) && to.meta.role.length > 0))
   ) {
-    snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.")
-    router.push({ name: "login" })
-  } else if (
-    auth.loaded && // If Authentication is not loaded preferred to let navigation through and redirect later if first data call returns with 401 or 403.
-    to.meta?.role != undefined &&
+    snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
+    return next({ name: "login" });
+  }
+
+  if (
+    to.meta?.role &&
     Array.isArray(to.meta.role) &&
     to.meta.role.length > 0 &&
-    !to.meta.role.some((role: Roles) => auth.roles.includes(role))
+    !to.meta.role.some((role) => auth.roles.includes(role))
   ) {
-    snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.")
-    router.back()
+    snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
+    return next(false);
   }
-  next()
-})
 
+  next();
+});
 export default router

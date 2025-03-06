@@ -75,15 +75,17 @@ export const useAuthenticationStore = defineStore("authentication", () => {
     return true
   }
 
-  async function checkLoggedIn() {
-    axios
-      .get<Authentication>("/auth", { baseURL: "http://localhost:8080/" })
-      .then((response) => {
-        if (response.status === 200) {
-          setAuthentication(response.data)
-        }
-      })
+async function checkLoggedIn() {
+  try {
+    const response = await axios.get<Authentication>("/auth", { baseURL: "http://localhost:8080/" });
+    if (response.status === 200) {
+      setAuthentication(response.data);
+    }
+  } catch (error) {
+    // Kein eingeloggter Benutzer – trotzdem den Ladevorgang abschließen
+    loaded.value = true;
   }
+}
 
   void checkLoggedIn()
 

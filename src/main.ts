@@ -26,7 +26,7 @@ app.use(router);
 const snackbar = useSnackbarStore();
 
 const port = 8080;
-axios.defaults.baseURL = "http://localhost:" + port + "/api";
+axios.defaults.baseURL = "http://localhost:" + port + "/eis/api";
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 axios.defaults.xsrfCookieName = "XSRF-TOKEN";
@@ -42,13 +42,13 @@ axios.interceptors.response.use(null, (error) => {
   if (error.response.status == 403) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
   }
-  if (error.response.status == 500 && error.response.data === "Bad credentials") {
+  if (error.response.status == 400 && error.response.data === "Bad credentials") {
     snackbar.push("Benutzername oder Passwort falsch.");
   }
-  else if (error.response.status == 500 && error.response.data === "Empty Password") {
+  else if (error.response.status == 400 && error.response.data === "Empty Password") {
     snackbar.push("Passwort darf nicht leer sein.");
   }
-  else if (error.response.status == 500 && error.response.data === "Benutzer nicht gefunden") {
+  else if (error.response.status == 400 && error.response.data === "Benutzer nicht gefunden") {
     snackbar.push("Username nicht gefunden.");
   }
   return Promise.reject(error);
