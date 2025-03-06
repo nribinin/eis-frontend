@@ -123,6 +123,11 @@ router.beforeResolve(async (to, from, next) => {
     !to.meta.role.some((role) => auth.roles.includes(role))
   ) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
+    if (auth.roles.includes(Roles.TEACHER)) {
+      return next({ name: "lehrer" });
+    } else if (auth.roles.includes(Roles.STUDENT)) {
+      return next({ name: "schueler" });
+    }
     return next(false);
   }
 
