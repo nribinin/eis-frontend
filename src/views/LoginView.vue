@@ -4,10 +4,10 @@
             <div class="header">
                 <nav>
                     <ul>
-                        <li> 
+                        <li class="logo-container"> 
                             <img src="@/assets/eis_logo_weiss.png" class="header-logo">
                         </li>
-                        <div>
+                        <div class="nav-links">
                             <li>
                                 <router-link to="/" @click="changeView('Login', 'Anmeldeseite')"
                                     :class="{ 'selectedSite': activeComponent === 'Login' }">Anmeldeseite</router-link>
@@ -64,10 +64,6 @@ export default {
     width: 100%;
 }
 
-.header-logo{
-    width: 100px;
-}
-
 .fixed {
     position: sticky;
     top: 0;
@@ -75,18 +71,30 @@ export default {
     z-index: 1000;
 }
 
-
 nav ul {
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-weight: bold;
     background-color: black;
+    padding: 10px;
+    height: 80px; /* Setzt die Höhe des Headers */
 }
 
-h3 {
-    margin: 0 !important;
-    margin-left: 0.5em !important;
+.logo-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.header-logo {
+    height: 100%; /* Passt die Bildhöhe an die Header-Höhe an */
+    width: auto;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
 }
 
 .selectedSite {
@@ -111,15 +119,5 @@ h3 {
     width: 65px;
     height: auto;
 }
-
-.footer h2 {
-    font-size: 1.5em;
-    margin: 0;
-}
-
-.footer p {
-    margin: 0.5em 0 0;
-    font-size: 1em;
-    color: #ffffff;
-}
 </style>
+    

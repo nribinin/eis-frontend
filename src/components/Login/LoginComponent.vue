@@ -12,7 +12,6 @@
             <input type="password" v-model="form.password" placeholder="Enter your password" required/>
           </div>
           <button @click="login">Log In</button>
-
         </form>
       </div>
     </div>
@@ -25,6 +24,7 @@ import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
 import type { LoginRequest } from "@/types/LoginRequest.ts"
 import { useRouter } from "vue-router"
 import { Roles } from "@/enum/Roles.ts"
+
 const authenticationStore = useAuthenticationStore()
 const router = useRouter()
 
@@ -35,11 +35,11 @@ const form = ref<LoginRequest>({
 })
 
 async function login() {
-  const sucessful = await authenticationStore.login(form.value)
-  if (sucessful) {
-    if(authenticationStore.roles.includes(Roles.STUDENT)) {
+  const successful = await authenticationStore.login(form.value)
+  if (successful) {
+    if (authenticationStore.roles.includes(Roles.STUDENT)) {
       router.push("/schueler")
-    } else if(authenticationStore.roles.includes(Roles.TEACHER)) {
+    } else if (authenticationStore.roles.includes(Roles.TEACHER)) {
       router.push("/lehrer")
     }
   }
@@ -55,6 +55,7 @@ async function login() {
   background-image: url('@/assets/TGM_blau.jpg');
   background-size: cover;
   background-position: center;
+  padding: 1em;
 }
 
 .login-container {
@@ -62,12 +63,15 @@ async function login() {
   color: white;
   padding: 2.5em;
   border-radius: 0.5em;
+  width: 100%;
+  max-width: 600px;
 }
 
 .login-box {
-  width: 31.25em;
+  width: 100%;
+  max-width: 100%;
   background-color: white;
-  padding: 1.25em;
+  padding: 1.5em;
   border-radius: 0.5em;
   box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2);
 }
@@ -84,7 +88,7 @@ async function login() {
   width: 100%;
   padding: 0.625em;
   margin: 0.625em 0;
-  border: 0.0625em solid #ccc;
+  border: 1px solid #ccc;
   border-radius: 0.25em;
   font-size: 1em;
 }
@@ -105,29 +109,10 @@ async function login() {
 }
 
 /* Media Queries für mobile Ansicht */
-@media (max-width: 30em) {
+@media (max-width: 600px) {
   .login-box {
-    width: 200%;
+    max-width: 100%;
     padding: 1em;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .login-box h1 {
-    font-size: 1.25em;
-  }
-
-  .login-box p {
-    font-size: 0.875em;
-  }
-
-  .login-box label {
-    font-size: 0.75em;
-  }
-
-  .login-box input, .login-box button {
-    padding: 0.5em;
   }
 }
 </style>

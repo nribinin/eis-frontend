@@ -63,6 +63,8 @@ export default {
   background-size: cover;
   background-position: center;
   color: #000;
+  display: flex;
+  justify-content: center;
 }
 
 .ilb-section {
@@ -70,15 +72,26 @@ export default {
   padding: 2em;
   border-radius: 0.5em;
   box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  width: 1200px;
+  box-sizing: border-box;
 }
 
-h2,
+h2 {
+  margin-bottom: 1em;
+  font-size: 2em;
+  text-align: center;
+}
+
 h3 {
   margin-bottom: 1em;
+  color: turquoise;
 }
 
 p {
   margin-bottom: 1em;
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 ul {
@@ -86,20 +99,34 @@ ul {
   padding-left: 2em;
 }
 
-.contacts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2em;
+@media (max-width: 768px) {
+  .ilb-section {
+    padding: 1.5em;
+    width: 100%;
+  }
+  h2 {
+    font-size: 1.8em;
+  }
+  h3 {
+    font-size: 1.4em;
+  }
+  p, ul {
+    font-size: 0.9em;
+  }
 }
 
-.contact {
-  background: #f9f9f9;
-  padding: 1em;
-  border-radius: 0.5em;
-  box-shadow: 0 0.3em 0.6em rgba(0, 0, 0, 0.1);
-}
-
-.contact h4 {
-  margin-bottom: 0.5em;
+@media (max-width: 480px) {
+  .ilb-section {
+    padding: 1em;
+  }
+  h2 {
+    font-size: 1.6em;
+  }
+  h3 {
+    font-size: 1.2em;
+  }
+  p, ul {
+    font-size: 0.8em;
+  }
 }
 </style>
