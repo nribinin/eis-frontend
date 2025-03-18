@@ -124,7 +124,7 @@
         <div
           v-for="(group, index) in groupedSubjectList"
           :key="index"
-          class="card card-group"
+          class="card"
           :class="getGroupRowClass(group)"
         >
           <div class="card-header" @click="toggleGroup(index)">
@@ -137,9 +137,7 @@
             <div v-if="expandedGroups.includes(index)" class="card-body">
               <!-- Jeder Eintrag innerhalb der Gruppe als eigene Inner-Card -->
               <div
-                v-for="subject in group"
-                :key="subject.ampelId"
-                class="inner-card"
+                v-for="subject in group" :key="subject.ampelId" class="inner-card"
                 :class="getRowClass(subject)"
               >
                 <div class="inner-card-header">

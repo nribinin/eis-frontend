@@ -40,13 +40,13 @@
             </div>
           </div>
           <div class="flex-center">
-            <button @click="toggleLegend" class="waves-effect waves-light btn button-right" v-if="legendVisible">
+            <button @click="toggleLegend" class="waves-effect waves-light btn " v-if="legendVisible">
               <i class="material-icons">arrow_upward</i>
             </button>
           </div>
         </div>
-        <div class="flex-center rightalign" v-else>
-          <button @click="toggleLegend" class="waves-effect waves-light btn button-right" style="color: white;">
+        <div class="flex-center " v-else>
+          <button @click="toggleLegend" class="waves-effect waves-light btn " style="color: white;">
             <i class="material-icons">arrow_downward</i>
           </button>
         </div>
@@ -73,7 +73,7 @@ export default {
 <style scoped>
 .flex-center {
   display: flex;
-  justify-content: right;
+  justify-content: center;
   align-items: center;
 }
 
@@ -105,12 +105,7 @@ export default {
   border-radius: 10px;
 }
 
-.button-right {
-  float: right !important;
-}
-.rightalign {
-  margin-right: 5em;
-}
+
 .slideTransition {
   transition: all 0.5s ease;
 }
@@ -121,21 +116,5 @@ export default {
   transform: translateY(-10px);
 }
 
-@media (max-width: 768px) {
-  .imgHeight {
-    height: 70px;
-  }
 
-  .flex-container-Legend {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .flex-container-Horizontal {
-    margin: 5px 0;
-  }
-  .rightalign {
-  margin-right: 0em;
-}
-}
 </style>
