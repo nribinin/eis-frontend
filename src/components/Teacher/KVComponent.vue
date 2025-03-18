@@ -4,10 +4,18 @@
     <!-- Eingabefeld zum Filtern nach Namen -->
     <input type="text" v-model="filter" placeholder="Namen filtern" />
 
+    <!-- Checkbox um Farben anzuzeigen -->
+    <div class="color-toggle">
+      <input type="checkbox" id="colorToggle" v-model="showColoredTiles" />
+      <label for="colorToggle" v-if="!showColoredTiles">Farben anzeigen</label>
+      <label for="colorToggle" v-else>Farben ausblenden</label>
+    </div>
+
     <ul class="my-collapsible-list">
       <li
         v-for="student in filteredStudents"
         :key="student.studentId"
+        :class="getTileColor(student)"
         class="my-collapsible-item"
       >
         <!-- Header zum Auf-/Zuklappen -->
@@ -87,6 +95,9 @@ const students = ref<KvStudentAmpelDto[]>([]);
 
 // Filter für die Schülernamen
 const filter = ref("");
+
+// Reactive variable to store the state of the checkbox
+const showColoredTiles = ref(false);
 
 // Computed-Property zum Filtern der Schüler basierend auf dem eingegebenen Filter
 const filteredStudents = computed(() =>
@@ -168,6 +179,20 @@ function sortedAmpelEntries(ampelEntries: AmpelDto[]): AmpelDto[] {
     (a, b) => (order[a.farbe ?? ""] || 5) - (order[b.farbe ?? ""] || 5)
   );
 }
+
+/**
+ * Bestimmt die Kachelfarbe basierend auf den Ampel-Einträgen des Schülers
+ */
+function getTileColor(student: KvStudentAmpelDto): string {
+  if (!showColoredTiles.value) return '';
+
+  const colors = student.ampelEntries.map(entry => entry.farbe);
+  if (colors.includes('SCHWARZ')) return 'black-tile';
+  if (colors.includes('ROT')) return 'red-tile';
+  if (colors.includes('GELB')) return 'yellow-tile';
+  if (colors.every(color => color === 'GRUEN')) return 'green-tile';
+  return 'white-tile';
+}
 </script>
 
 <style scoped>
@@ -213,6 +238,7 @@ function sortedAmpelEntries(ampelEntries: AmpelDto[]): AmpelDto[] {
 }
 .mini-table thead tr {
   background-color: #f2f2f2;
+  color: black;
 }
 .mini-table th,
 .mini-table td {
@@ -238,6 +264,27 @@ function sortedAmpelEntries(ampelEntries: AmpelDto[]): AmpelDto[] {
   color: #fff !important;
 }
 
+/* Hintergrundfarben für Kacheln je nach Ampel-Farbe */
+.black-tile {
+  background-color: black;
+  color: white;
+}
+.red-tile {
+  background-color: #e30613;
+  color: white;
+}
+.yellow-tile {
+  background-color: #ffa500;
+  color: white;
+}
+.green-tile {
+  background-color: #005c27;
+  color: white;
+}
+.white-tile {
+  background-color: white;
+}
+
 /* Transition */
 .slide-fade-enter-active,
 .slide-fade-leave-active {
@@ -258,5 +305,10 @@ input[type="text"] {
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+/* Add some styles for the checkbox */
+.color-toggle {
+  margin: 1em 0;
 }
 </style>

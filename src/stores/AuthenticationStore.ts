@@ -46,13 +46,13 @@ export const useAuthenticationStore = defineStore("authentication", () => {
     roles.value = []  // Array initialisieren
 
     // Prüfe auf alle relevanten Rollen:
-    if (authorities.includes("ROLE_TEACHER")) {
+    if (authorities.includes("ROLE_LEHRER")) {
       roles.value.push(Roles.TEACHER)
     }
     if (authorities.includes("ROLE_ADMIN")) {
       roles.value.push(Roles.ADMIN)
     }
-    if (authorities.includes("ROLE_STUDENT")) {
+    if (authorities.includes("ROLE_SCHUELER")) {
       roles.value.push(Roles.STUDENT)
     }
 

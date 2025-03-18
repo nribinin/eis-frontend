@@ -149,7 +149,9 @@
               <span v-if="editingIndex === index">
                 <input
                   class="noteinput"
-                  v-model="student.note"
+                  v-model="student.note" :class="{
+                      currentinput: student.selectedColor != 'GRAU' && student.selectedColor != null,
+                    }"
                   @blur="onNoteChange(student, index)"
                   @keyup.enter="onNoteChange(student, index)"
                   placeholder="Anmerkung eingeben"
@@ -157,7 +159,7 @@
               </span>
               <span v-else @click="editingIndex = index">
                 <template v-if="student.note">
-                  {{ student.note }}
+                  <i class="material-icons">edit</i> {{ student.note }} 
                 </template>
                 <template v-else>
                   <i class="material-icons">add</i>
@@ -342,9 +344,6 @@ export default defineComponent({
         );
         return;
       }
-      if (!student.note || student.note.trim().length === 0) {
-        student.note = "Keine Bemerkung";
-      }
       this.saveAmpel(student);
     },
 
@@ -442,6 +441,10 @@ th {
 .radio-buttons label {
   display: inline-block;
   margin-right: 0.5em;
+}
+
+.radio-buttons{
+  display: flex;
 }
 
 .legend-toggle {
@@ -564,6 +567,14 @@ p {
   width: 90%;
 }
 
+.currentinput:focus{
+  color: white;
+}
+
+.currentinput{
+  color: white;
+}
+
 /* Beispiel: Floating Action Button, falls gebraucht */
 .fab-container {
   position: fixed;
@@ -609,5 +620,21 @@ p {
   border-width: 5px;
   border-style: solid;
   border-color: #fff transparent transparent transparent;
+}
+.radio-buttons {
+  display: flex;
+  flex-wrap: wrap;
+}
+@media (max-width: 768px) {
+  .radio-buttons {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .radio-buttons label {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 10px;
+  }
 }
 </style>
