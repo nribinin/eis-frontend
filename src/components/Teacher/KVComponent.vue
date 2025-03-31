@@ -116,7 +116,13 @@ onMounted(async () => {
       );
       return;
     }
-    const sortedData = resp.data.sort(
+
+    const processedData = resp.data.map((student: KvStudentAmpelDto) => ({
+      ...student,
+      ampelEntries: student.ampelEntries.filter(entry => entry.farbe !== "GRAU"),
+    }));
+
+    const sortedData = processedData.sort(
       (a: KvStudentAmpelDto, b: KvStudentAmpelDto) => {
         return a.studentName
           .toLowerCase()
