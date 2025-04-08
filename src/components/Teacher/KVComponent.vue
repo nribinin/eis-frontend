@@ -7,17 +7,20 @@
     <!-- Checkbox um Farben anzuzeigen -->
     <div class="color-toggle">
       <input type="checkbox" id="colorToggle" v-model="showColoredTiles" />
-      <label for="colorToggle" v-if="!showColoredTiles">Farben anzeigen</label>
-      <label for="colorToggle" v-else>Farben ausblenden</label>
+      <label class="showcolor btn grey waves-light" for="colorToggle" v-if="!showColoredTiles">Farben anzeigen</label>
+      <label class="hidecolor btn blue lighten-1 waves-light" for="colorToggle" v-else>Farben ausblenden</label>
+
+       <!-- Button zum Aufklappen/Zuklappen aller Schüler -->
+    <button class="btn waves-effect waves-light right blue lighten-1 toggle-all-btn" @click="toggleAllStudents">
+      {{ allStudentsOpen ? "Alle zuklappen" : "Alle aufklappen" }}
+    </button>
     </div>
 
+   
+
     <ul class="my-collapsible-list">
-      <li
-        v-for="student in filteredStudents"
-        :key="student.studentId"
-        :class="getTileColor(student)"
-        class="my-collapsible-item"
-      >
+      <li v-for="student in filteredStudents" :key="student.studentId" :class="getTileColor(student)"
+        class="my-collapsible-item">
         <!-- Header zum Auf-/Zuklappen -->
         <div class="my-collapsible-header" @click="toggle(student)">
           <h3>{{ student.studentName }}</h3>
@@ -44,11 +47,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(ampel, aIndex) in sortedAmpelEntries(student.ampelEntries)"
-                  :key="aIndex"
-                  :class="rowClass(ampel.farbe)"
-                >
+                <tr v-for="(ampel, aIndex) in sortedAmpelEntries(student.ampelEntries)" :key="aIndex"
+                  :class="rowClass(ampel.farbe)">
                   <td>{{ ampel.subjectLangbezeichnung }}</td>
                   <td>{{ ampel.farbe ?? "–" }}</td>
                   <td>{{ ampel.bemerkung ?? "Keine Bemerkung" }}</td>
@@ -106,6 +106,9 @@ const filteredStudents = computed(() =>
   )
 );
 
+// Reactive variable to store the state of all students
+const allStudentsOpen = ref(false);
+
 // Lifecycle
 onMounted(async () => {
   try {
@@ -146,6 +149,14 @@ function toggle(student: KvStudentAmpelDto) {
   student.isOpen = !student.isOpen;
 }
 
+// Auf-/Zuklappen aller Schüler
+function toggleAllStudents() {
+  allStudentsOpen.value = !allStudentsOpen.value;
+  students.value.forEach(student => {
+    student.isOpen = allStudentsOpen.value;
+  });
+}
+
 /**
  * Zeilenfarbe bestimmen anhand ampel.farbe
  */
@@ -181,9 +192,18 @@ function sortedAmpelEntries(ampelEntries: AmpelDto[]): AmpelDto[] {
     GELB: 3,
     GRUEN: 4
   };
-  return [...ampelEntries].sort(
-    (a, b) => (order[a.farbe ?? ""] || 5) - (order[b.farbe ?? ""] || 5)
-  );
+
+  return [...ampelEntries].sort((a, b) => {
+    // Zuerst nach der langen Fachbezeichnung sortieren
+    const subjectComparison = a.subjectLangbezeichnung
+      .localeCompare(b.subjectLangbezeichnung, undefined, { sensitivity: "base" });
+    if (subjectComparison !== 0) {
+      return subjectComparison;
+    }
+
+    // Dann nach der Farbe sortieren
+    return (order[a.farbe ?? ""] || 5) - (order[b.farbe ?? ""] || 5);
+  });
 }
 
 /**
@@ -196,7 +216,7 @@ function getTileColor(student: KvStudentAmpelDto): string {
   if (colors.includes('SCHWARZ')) return 'black-tile';
   if (colors.includes('ROT')) return 'red-tile';
   if (colors.includes('GELB')) return 'yellow-tile';
-  if (colors.every(color => color === 'GRUEN')) return 'green-tile';
+  if (colors.includes('GRUEN')) return 'green-tile';
   return 'white-tile';
 }
 </script>
@@ -210,17 +230,20 @@ function getTileColor(student: KvStudentAmpelDto): string {
   padding: 20px;
   border-radius: 8px;
 }
+
 .my-collapsible-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .my-collapsible-item {
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   background: #fff;
 }
+
 .my-collapsible-header {
   cursor: pointer;
   padding: 10px;
@@ -228,24 +251,29 @@ function getTileColor(student: KvStudentAmpelDto): string {
   align-items: center;
   justify-content: space-between;
 }
+
 .my-collapsible-header h3 {
   margin: 0;
   font-size: 18px;
 }
+
 .my-collapsible-body {
   padding: 10px;
   border-top: 1px solid #ccc;
 }
+
 /* Minimale Tabelle für Ampel-Einträge */
 .mini-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
+
 .mini-table thead tr {
   background-color: #f2f2f2;
   color: black;
 }
+
 .mini-table th,
 .mini-table td {
   border: 1px solid #ccc;
@@ -258,13 +286,16 @@ function getTileColor(student: KvStudentAmpelDto): string {
   background-color: #009640 !important;
   color: #fff !important;
 }
+
 .rowyellow {
   background-color: #ffc107 !important;
 }
+
 .rowred {
   background-color: #e30613 !important;
   color: white !important;
 }
+
 .rowblack {
   background-color: #333 !important;
   color: #fff !important;
@@ -275,18 +306,22 @@ function getTileColor(student: KvStudentAmpelDto): string {
   background-color: black;
   color: white;
 }
+
 .red-tile {
   background-color: #e30613;
   color: white;
 }
+
 .yellow-tile {
   background-color: #ffa500;
   color: white;
 }
+
 .green-tile {
   background-color: #005c27;
   color: white;
 }
+
 .white-tile {
   background-color: white;
 }
@@ -296,6 +331,7 @@ function getTileColor(student: KvStudentAmpelDto): string {
 .slide-fade-leave-active {
   transition: all 0.3s ease;
 }
+
 .slide-fade-enter,
 .slide-fade-leave-to {
   transform: translateY(-10px);
@@ -316,5 +352,16 @@ input[type="text"] {
 /* Add some styles for the checkbox */
 .color-toggle {
   margin: 1em 0;
+}
+
+#colorToggle input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.showcolor,
+.hidecolor {
+  cursor: pointer;
+  font-size: 16px;
+  color: #ffffff;
 }
 </style>
