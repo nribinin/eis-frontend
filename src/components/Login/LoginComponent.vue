@@ -29,9 +29,9 @@ const authenticationStore = useAuthenticationStore()
 const router = useRouter()
 
 const form = ref<LoginRequest>({
-  username: "nribinin",
+  username: "",
   password: "",
-  simulate: true
+  simulate: false
 })
 
 async function login() {

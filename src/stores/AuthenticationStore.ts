@@ -12,12 +12,14 @@ export const useAuthenticationStore = defineStore("authentication", () => {
   const roles = ref<Roles[]>([])  // Mehrere Rollen speichern
   const displayName = ref<string | null>(null)
 
+
+
   async function login(loginRequest: LoginRequest): Promise<boolean> {
     const response = await axios.post<
       Authentication,
       AxiosResponse<Authentication>,
       LoginRequest
-    >("/auth/login", loginRequest, { baseURL: "http://localhost:8080/" })
+    >("/auth/login", loginRequest, { baseURL: (import.meta.env.VITE_API ?? '') })
 
     if (response.status === 200) {
       setAuthentication(response.data)
@@ -29,7 +31,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
   async function logout(): Promise<boolean> {
     const response = await axios.post<string>("/auth/logout", null, {
-      baseURL: "http://localhost:8080/"
+      baseURL: (import.meta.env.VITE_API ?? '')
     })
     if (response.status === 200) {
       loggedIn.value = false
@@ -77,7 +79,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
 async function checkLoggedIn() {
   try {
-    const response = await axios.get<Authentication>("/auth", { baseURL: "http://localhost:8080/" });
+    const response = await axios.get<Authentication>("/auth", { baseURL: (import.meta.env.VITE_API ?? '') });
     if (response.status === 200) {
       setAuthentication(response.data);
     }

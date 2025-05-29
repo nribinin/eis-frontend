@@ -25,8 +25,8 @@ app.use(router);
 
 const snackbar = useSnackbarStore();
 
-const port = 8080;
-axios.defaults.baseURL = "http://localhost:" + port + "/api";
+axios.defaults.baseURL = (import.meta.env.VITE_API ?? '') + '/eis/api'
+//axios.defaults.baseURL = "http://10.2.24.50:10001/api";
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 axios.defaults.xsrfCookieName = "XSRF-TOKEN";
