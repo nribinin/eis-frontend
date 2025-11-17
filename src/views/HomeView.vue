@@ -11,10 +11,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "NavigationComponent"
-}
+<script lang="ts">
+import {defineComponent} from "vue";
+
+export default defineComponent({
+  name: "HomeView"
+});
 </script>
 
 <style scoped>

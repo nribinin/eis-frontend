@@ -8,10 +8,15 @@
               <h3>Klassenvorstand</h3>
             </li>
             <div>
+              <router-link to="/admin" custom v-slot="{ href, route, navigate }">
+                <li v-if="authenticationStore.isRouteVisible(route)" @click="router.push(href)" class="selectedSite choose">
+                  Admin
+                </li>
+              </router-link>
               <li class="selectSite hoveOnKV choose" @click="toTeacher">
                 Ampeleintragung
               </li>
-              <li class="selectedSite choose">KV-Ansicht</li>
+              <li class="selectedSite choose">KV</li>
               <div class="logout right">
                 <div class="material-icons" @click="logout">exit_to_app</div>
               </div>

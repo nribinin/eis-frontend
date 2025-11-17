@@ -29,11 +29,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Login from '@/components/Login/LoginComponent.vue';
 import Lernbetreuung from '@/components/Login/LernbetreuungComponent.vue';
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
     data() {
         return {
             activeComponent: 'Login',
@@ -41,7 +42,7 @@ export default {
         };
     },
     methods: {
-        changeView(componentName, newTitle) {
+        changeView(componentName: string, newTitle: string) {
             this.activeComponent = componentName;
             this.title = newTitle;
         },
@@ -50,7 +51,7 @@ export default {
         Login,
         Lernbetreuung
     },
-};
+});
 </script>
 
 <style scoped>

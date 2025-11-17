@@ -7,18 +7,19 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Legende from "@/components/Teacher/LegendeKomp.vue";
 import SchuelerTable from "@/components/Students/SchuelerTable.vue";
 import SchuelerHeader from "@/components/Students/SchuelerHeader.vue";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   components: {
     Legende,
     SchuelerTable,
     SchuelerHeader,
   },
-};
+});
 </script>
 
 <style scoped>

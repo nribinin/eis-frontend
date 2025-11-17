@@ -8,9 +8,14 @@
               <h3>Ampeleintragung</h3>
             </li>
             <div>
+              <router-link to="/admin" custom v-slot="{ href, route, navigate }">
+                <li v-if="authenticationStore.isRouteVisible(route)" @click="router.push(href)" class="selectedSite hoveOnKV choose">
+                  Admin
+                </li>
+              </router-link>
               <li class="selectedSite choose">Ampeleintragung</li>
               <li @click="toKV" class="selectSite hoveOnKV choose">
-                KV-Ansicht
+                KV
               </li>
               <div class="logout right">
                 <div class="material-icons" @click="logout">exit_to_app</div>
@@ -39,6 +44,10 @@ const authenticationStore = useAuthenticationStore();
 
 async function toKV() {
   router.push("/lehrer/kv");
+}
+
+async function toAdmin() {
+  router.push("/admin");
 }
 
 async function logout() {

@@ -196,7 +196,7 @@ export default defineComponent({
   props: {
     teacherId: {
       type: Number,
-      required: true,
+      required: false,
     },
   },
   data() {

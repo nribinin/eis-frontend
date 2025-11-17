@@ -55,8 +55,11 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import {defineComponent} from "vue";
+
+export default defineComponent({
+  name: "LegendeKomp",
   data() {
     return {
       legendVisible: true,
@@ -67,7 +70,7 @@ export default {
       this.legendVisible = !this.legendVisible;
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -37,6 +37,7 @@ axios.interceptors.request.use((request) => {
 axios.interceptors.response.use(null, (error) => {
   if (error.response.status == 401) {
     snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
+    console.log('####### next login from main', error);
     router.push("/");
   }
   if (error.response.status == 403) {
