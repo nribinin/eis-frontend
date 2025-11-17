@@ -1,11 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import {createRouter, createWebHistory} from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
 import SchuelerView from '@/views/SchuelerView.vue'
 import AdminView from '@/views/Admin/AdminView.vue'
-import { Roles } from "@/enum/Roles.ts"
-import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts"
+import {Roles} from "@/enum/Roles.ts"
+import {useAuthenticationStore} from "@/stores/AuthenticationStore.ts"
+import {useSnackbarStore} from "@/stores/SnackbarStore.ts"
 
 
 const router = createRouter({
@@ -47,45 +46,45 @@ const router = createRouter({
       path: "/admin",
       name: "Admin",
       component: AdminView,
-      meta: { 
+      meta: {
         authRequired: true,
-        role: [Roles.ADMIN] 
+        role: [Roles.ADMIN]
       }
     },
     {
       path: "/admin/database",
       name: "database",
       component: () => import("@/views/Admin/AdminSokratesView.vue"),
-      meta: { 
+      meta: {
         authRequired: true,
-        role: [Roles.ADMIN] 
+        role: [Roles.ADMIN]
       }
     },
     {
       path: "/admin/editkv",
       name: "editkv",
       component: () => import("@/views/Admin/AdminEditKVView.vue"),
-      meta: { 
+      meta: {
         authRequired: true,
-        role: [Roles.ADMIN] 
+        role: [Roles.ADMIN]
       }
     },
     {
       path: "/admin/editStudents",
       name: "editStudents",
       component: () => import("@/views/Admin/AdminEditStudentsView.vue"),
-      meta: { 
+      meta: {
         authRequired: true,
-        role: [Roles.ADMIN] 
+        role: [Roles.ADMIN]
       }
     },
     {
       path: "/admin/editTeachers",
       name: "editTeachers",
       component: () => import("@/views/Admin/AdminEditTeachersView.vue"),
-      meta: { 
+      meta: {
         authRequired: true,
-        role: [Roles.ADMIN] 
+        role: [Roles.ADMIN]
       }
     },
   ],
@@ -100,28 +99,25 @@ router.beforeResolve(async (to, from, next) => {
   if (!auth.loaded) {
 
   }
-    console.log('beforeResolve', to, from, auth.loggedIn, auth.roles);
 
   if (to.name === "login" && auth.loggedIn) {
     if (auth.roles.includes(Roles.TEACHER)) {
-        console.log('####### next login lehrer');
       return next({ name: "lehrer" });
     } else if (auth.roles.includes(Roles.STUDENT)) {
       return next({ name: "schueler" });
     }
   }
 
-  if (
+  if (to.name !== "login" &&
     !auth.loggedIn &&
     (to.meta?.authRequired === true ||
       (to.meta?.role && Array.isArray(to.meta.role) && to.meta.role.length > 0))
   ) {
     snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
-    console.log('####### next login from index');
     return next({ name: "login" });
   }
 
-  if (
+  if (to.name !== "login" &&
     to.meta?.role &&
     Array.isArray(to.meta.role) &&
     to.meta.role.length > 0 &&
@@ -129,17 +125,13 @@ router.beforeResolve(async (to, from, next) => {
   ) {
     snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
     if (auth.roles.includes(Roles.TEACHER)) {
-        console.log('####### next lehrer');
       return next({ name: "lehrer" });
     } else if (auth.roles.includes(Roles.STUDENT)) {
-        console.log('####### next schueler');
       return next({ name: "schueler" });
     }
-      console.log('####### next false');
     return next(false);
   }
 
-    console.log('####### next next');
   next();
 });
 export default router

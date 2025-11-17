@@ -4,6 +4,9 @@
       <div class="header">
         <nav>
           <ul>
+            <div class="goBack" @click="goBack">
+              <p>Zurück</p>
+            </div>
             <li>
               <h3>{{ title }}</h3>
             </li>
@@ -39,6 +42,9 @@ async function logout() {
   } catch (error) {
     snackbar.push("Logout fehlgeschlagen: " + error);
   }
+}
+async function goBack() {
+  await router.push("/lehrer");
 }
 </script>
 

@@ -28,16 +28,15 @@ const snackbar = useSnackbarStore();
 axios.defaults.baseURL = (import.meta.env.VITE_API ?? '') + '/eis/api'
 //axios.defaults.baseURL = "http://10.2.24.50:10001/api";
 axios.defaults.withCredentials = true;
-axios.defaults.withXSRFToken = true;
+/*axios.defaults.withXSRFToken = true;
 axios.defaults.xsrfCookieName = "XSRF-TOKEN";
-axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN";
+axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN";*/
 axios.interceptors.request.use((request) => {
   return request;
 });
 axios.interceptors.response.use(null, (error) => {
   if (error.response.status == 401) {
     snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
-    console.log('####### next login from main', error);
     router.push("/");
   }
   if (error.response.status == 403) {

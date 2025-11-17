@@ -9,7 +9,7 @@
             </li>
             <div>
               <router-link to="/admin" custom v-slot="{ href, route, navigate }">
-                <li v-if="authenticationStore.isRouteVisible(route)" @click="router.push(href)" class="selectedSite hoveOnKV choose">
+                <li v-if="authenticationStore.isRouteVisible(route)" @click="router.push(href)" class="hoveOnKV choose">
                   Admin
                 </li>
               </router-link>
