@@ -292,12 +292,13 @@ export default defineComponent({
       const response = await axios.get("/teacher-ampel/getLehrer");
       const data = response.data;
       this.students = data.map((ampel: any) => {
+        const studentNNameSplitIndex = ampel.studentName.trim().lastIndexOf(" ");
         return {
           lessonId: ampel.lessonId,
           studentId: ampel.studentId,
           teacherId: ampel.teacherId,
-          nname: ampel.studentName.split(" ")[1] || "???",
-          vname: ampel.studentName.split(" ")[0] || "",
+          nname: ampel.studentName.substring(studentNNameSplitIndex + 1) || "???",
+          vname: ampel.studentName.substring(0, studentNNameSplitIndex) || "",
           klasse: ampel.hitclassName || "",
           fach: ampel.subjectLangbezeichnung || "",
           selectedColor: ampel.farbe || null,

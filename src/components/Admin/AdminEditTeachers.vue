@@ -103,7 +103,7 @@
         <!-- Lehrer-Name nur anzeigen, nicht änderbar -->
         <div class="row">
           <div class="col s12">
-            <p><strong>Lehrer:</strong> {{ teacherToEdit?.name }}</p>
+            <p><strong>Lehrer:</strong> <input type="text" v-model="teacherToEditName"/></p>
           </div>
         </div>
         <div class="row">
@@ -204,6 +204,7 @@ export default defineComponent({
 
     // "Bearbeiten" States
     const teacherToEdit = ref<TeacherWithLessonsDto | null>(null);
+    const teacherToEditName = ref("");
     const selectedLessonIdsEdit = ref<number[]>([]);
 
     // "Löschen" States
@@ -292,6 +293,8 @@ export default defineComponent({
     function openEditModal(teacher: TeacherWithLessonsDto) {
       teacherToEdit.value = teacher;
 
+      teacherToEditName.value = teacher.name;
+
       // existing lessonIds => vorausgewählt
       if (teacher.lessonIds) {
         selectedLessonIdsEdit.value = [...teacher.lessonIds];
@@ -354,6 +357,7 @@ export default defineComponent({
       try {
         const body = {
           id: teacherToEdit.value.id,
+          name: teacherToEditName.value,
           lessonIds: selectedLessonIdsEdit.value
         };
         const resp = await axios.put("/admin/updateTeacher", body);
@@ -412,6 +416,7 @@ export default defineComponent({
       selectedLessonIdsAdd,
       
       teacherToEdit,
+      teacherToEditName,
       selectedLessonIdsEdit,
       
       teacherToDelete,
