@@ -89,7 +89,7 @@
             :key="index"
             :class="rowClass(student.selectedColor)"
           >
-            <td>{{ student.nname }} {{ student.vname }}</td>
+            <td>{{ student.name }}</td>
             <td>{{ student.klasse }}</td>
             <td>{{ student.fach }}</td>
             <td>
@@ -183,8 +183,7 @@ interface AmpelStudent {
   lessonId: number;
   studentId: number;
   teacherId: number;
-  vname: string;
-  nname: string;
+  name: string;
   klasse: string;
   fach: string;
   selectedColor: string | null;
@@ -235,20 +234,11 @@ export default defineComponent({
           const terms = this.searchTerm
             .toLowerCase()
             .split("/")
-            .filter((t) => t.trim());
-          const fullName = (student.nname + " " + student.vname).toLowerCase();
-          const fullNameRev = (
-            student.vname +
-            " " +
-            student.nname
-          ).toLowerCase();
+            .filter((t) => t.trim())
 
           const allMatch = terms.every((term) => {
             return (
-              student.nname.toLowerCase().includes(term) ||
-              student.vname.toLowerCase().includes(term) ||
-              fullName.includes(term) ||
-              fullNameRev.includes(term) ||
+              student.name.toLowerCase().includes(term) ||
               student.klasse.toLowerCase().includes(term) ||
               student.fach.toLowerCase().includes(term)
             );
@@ -267,9 +257,7 @@ export default defineComponent({
           let cmp = 0;
 
           if (col === "name") {
-            const aname = a.nname.toLowerCase() + " " + a.vname.toLowerCase();
-            const bname = b.nname.toLowerCase() + " " + b.vname.toLowerCase();
-            cmp = aname.localeCompare(bname);
+            cmp = a.name.toLowerCase().localeCompare(b.name.toLowerCase());
           } else if (col === "klasse") {
             cmp = a.klasse.toLowerCase().localeCompare(b.klasse.toLowerCase());
           } else if (col === "fach") {
@@ -292,13 +280,11 @@ export default defineComponent({
       const response = await axios.get("/teacher-ampel/getLehrer");
       const data = response.data;
       this.students = data.map((ampel: any) => {
-        const studentNNameSplitIndex = ampel.studentName.trim().lastIndexOf(" ");
         return {
           lessonId: ampel.lessonId,
           studentId: ampel.studentId,
           teacherId: ampel.teacherId,
-          nname: ampel.studentName.substring(studentNNameSplitIndex + 1) || "???",
-          vname: ampel.studentName.substring(0, studentNNameSplitIndex) || "",
+          name: ampel.studentName,
           klasse: ampel.hitclassName || "",
           fach: ampel.subjectLangbezeichnung || "",
           selectedColor: ampel.farbe || null,
