@@ -1,17 +1,15 @@
-import { ref } from "vue"
-import { defineStore } from "pinia"
-import axios, { type AxiosResponse } from "axios"
-import type { LoginRequest } from "@/types/LoginRequest.ts"
-import type { Authentication } from "@/types/Authentication.ts"
-import { Roles } from "@/enum/Roles.ts"
-import type { RouteLocationResolvedGeneric } from "vue-router"
+import {ref} from "vue"
+import {defineStore} from "pinia"
+import axios, {type AxiosResponse, HttpStatusCode} from "axios"
+import type {LoginRequest} from "@/types/LoginRequest.ts"
+import type {Authentication} from "@/types/Authentication.ts"
+import {Roles} from "@/enum/Roles.ts"
+import type {RouteLocationResolvedGeneric} from "vue-router"
 
 export const useAuthenticationStore = defineStore("authentication", () => {
-  const loaded = ref(false)
   const loggedIn = ref(false)
   const roles = ref<Roles[]>([])  // Mehrere Rollen speichern
   const displayName = ref<string | null>(null)
-
 
 
   async function login(loginRequest: LoginRequest): Promise<boolean> {
@@ -19,7 +17,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
       Authentication,
       AxiosResponse<Authentication>,
       LoginRequest
-    >("/auth/login", loginRequest, { baseURL: (import.meta.env.VITE_API ?? '') })
+    >("/auth/login", loginRequest, {baseURL: (import.meta.env.VITE_API ?? '')})
 
     if (response.status === 200) {
       setAuthentication(response.data)
@@ -60,7 +58,6 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
     // Setze loggedIn nur, wenn mindestens eine Rolle vorhanden ist
     loggedIn.value = roles.value.length > 0
-    loaded.value = true
   }
 
   function isRouteVisible(route: RouteLocationResolvedGeneric): boolean {
@@ -77,29 +74,26 @@ export const useAuthenticationStore = defineStore("authentication", () => {
     return true
   }
 
-async function checkLoggedIn() {
-  try {
-    const response = await axios.get<Authentication>("/auth", { baseURL: (import.meta.env.VITE_API ?? '') });
-    if (response.status === 200) {
+  async function checkLoggedIn() {
+    const response = await axios.get<Authentication>("/auth", {baseURL: (import.meta.env.VITE_API ?? '')});
+    if (response.status === HttpStatusCode.Ok) {
       setAuthentication(response.data);
+    } else if (response.status === HttpStatusCode.NoContent) {
+      // Not logged in
+      loggedIn.value = false;
     }
-  } catch (error) {
-    // Kein eingeloggter Benutzer – trotzdem den Ladevorgang abschließen
-    loaded.value = true;
   }
-}
 
-  void checkLoggedIn()
+  const authPromise = checkLoggedIn()
 
   return {
-    loaded,
     loggedIn,
     login,
     logout,
     roles, // jetzt ein Array mit allen Rollen
     isRouteVisible,
     displayName,
-    checkLoggedIn,
+    authPromise
   }
 }, {
   persist: true // <-- sorgt dafür, dass der State gespeichert wird

@@ -15,7 +15,7 @@ function snackbarTimeout(open: boolean): void {
     location="top"
     :model-value="snackbar.open"
     @update:model-value="snackbarTimeout"
-    :timeout="snackbar.current?.timeout ?? 5000"
+    :timeout="snackbar.current?.timeout ?? 3000"
   >
     {{ snackbar.current?.message ?? "" }}
 

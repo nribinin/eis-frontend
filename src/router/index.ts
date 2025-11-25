@@ -94,12 +94,10 @@ router.beforeResolve(async (to, from, next) => {
   const auth = useAuthenticationStore();
   const snackbar = useSnackbarStore();
 
-
   // Warten, bis auth geladen ist
-  if (!auth.loaded) {
+  await auth.authPromise;
 
-  }
-
+  // Redirect away from login page if already logged in
   if (to.name === "login" && auth.loggedIn) {
     if (auth.roles.includes(Roles.TEACHER)) {
       return next({ name: "lehrer" });
@@ -108,6 +106,7 @@ router.beforeResolve(async (to, from, next) => {
     }
   }
 
+  // Not logged in
   if (to.name !== "login" &&
     !auth.loggedIn &&
     (to.meta?.authRequired === true ||
@@ -117,6 +116,7 @@ router.beforeResolve(async (to, from, next) => {
     return next({ name: "login" });
   }
 
+  // Not enough rights to access a page
   if (to.name !== "login" &&
     to.meta?.role &&
     Array.isArray(to.meta.role) &&
@@ -132,6 +132,9 @@ router.beforeResolve(async (to, from, next) => {
     return next(false);
   }
 
+  if (to.name !== "login") {
+    snackbar.close() // Close Snackbar if redirect to any page except login and no role issue
+  }
   next();
 });
 export default router
