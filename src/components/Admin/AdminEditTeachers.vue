@@ -162,7 +162,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, nextTick } from "vue";
 import axios from "axios";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
 declare const M: any;
 
@@ -189,7 +188,6 @@ interface LessonDto {
 export default defineComponent({
   name: "TeacherManagement",
   setup() {
-    const snackbar = useSnackbarStore();
 
     // Haupt-Liste der Lehrer
     const teachers = ref<TeacherWithLessonsDto[]>([]);
@@ -230,7 +228,7 @@ export default defineComponent({
         const response = await axios.get("/admin/getAllTeachersWithLessons");
         teachers.value = response.data;
       } catch (error) {
-        snackbar.push("Fehler beim Laden der Lehrer: " + error);
+        M.toast({html: "Fehler beim Laden der Lehrer: " + error});
       }
     }
 
@@ -246,7 +244,7 @@ export default defineComponent({
         // Nach dem Laden => init Materialize-Select
         nextTick(() => initMaterializeSelect());
       } catch (error) {
-        snackbar.push("Fehler beim Laden der Fächer: " + error);
+        M.toast({html: "Fehler beim Laden der Fächer: " + error});
       }
     }
 
@@ -273,17 +271,17 @@ export default defineComponent({
         };
         const response = await axios.post("/admin/newTeacher", body);
         if (response.status === 201) {
-          snackbar.push("Neuer Lehrer erfolgreich angelegt!");
+          M.toast({html: "Neuer Lehrer erfolgreich angelegt!"});
           // Form reset
           newTeacherName.value = "";
           selectedLessonIdsAdd.value = [];
           await fetchAllTeachers();
         } else {
           await fetchAllTeachers();
-          snackbar.push("Lehrer angelegt/aktualisiert.");
+          M.toast({html: "Lehrer angelegt/aktualisiert."});
         }
       } catch (error: any) {
-        snackbar.push("Fehler beim Anlegen des Lehrers: " + (error.response?.data ?? error));
+        M.toast({html: "Fehler beim Anlegen des Lehrers: " + (error.response?.data ?? error)});
       }
     }
 
@@ -362,11 +360,11 @@ export default defineComponent({
         };
         const resp = await axios.put("/admin/updateTeacher", body);
         if (resp.status === 200) {
-          snackbar.push("Lehrer-Fächer erfolgreich aktualisiert!");
+          M.toast({html: "Lehrer-Fächer erfolgreich aktualisiert!"});
           await fetchAllTeachers();
         }
       } catch (error: any) {
-        snackbar.push("Fehler beim Aktualisieren: " + (error.response?.data ?? error));
+        M.toast({html: "Fehler beim Aktualisieren: " + (error.response?.data ?? error)});
       }
     }
 
@@ -391,9 +389,9 @@ export default defineComponent({
         await axios.delete(`/admin/deleteTeacher/${teacherToDelete.value.id}`);
         teacherToDelete.value = null;
         await fetchAllTeachers();
-        snackbar.push("Lehrer erfolgreich gelöscht.");
+        M.toast({html: "Lehrer erfolgreich gelöscht."});
       } catch (error) {
-        snackbar.push("Fehler beim Löschen des Lehrers: " + error);
+        M.toast({html: "Fehler beim Löschen des Lehrers: " + error});
       }
     }
 

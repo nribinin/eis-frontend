@@ -174,10 +174,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 import axios from "axios";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 
 interface AmpelStudent {
   lessonId: number;
@@ -292,9 +290,9 @@ export default defineComponent({
         } as AmpelStudent;
       });
     } catch (error: any) {
-      snackbar.push(
-        "Fehler beim Laden der Ampeldaten. Melde dich bitte beim Systemadministrator!"
-      );
+      M.toast({html:
+          "Fehler beim Laden der Ampeldaten. Melde dich bitte beim Systemadministrator!" + error.response.data
+      });
     }
   },
   methods: {
@@ -326,25 +324,25 @@ export default defineComponent({
     onNoteChange(student: AmpelStudent, index: number) {
       this.editingIndex = -1;
       if (!student.selectedColor) {
-        snackbar.push(
-          "Keine Ampelfarbe ausgewählt. Bitte wähle zuerst eine Farbe aus, dann eine Bemerkung."
-        );
+        M.toast({html:
+            "Keine Ampelfarbe ausgewählt. Bitte wähle zuerst eine Farbe aus, dann eine Bemerkung."
+        });
         return;
       }
       this.saveAmpel(student);
     },
 
     async saveAmpel(student: AmpelStudent) {
-      if (student.selectedColor === null) {
-        await axios.delete("/ampel", {
-          params: {
-            lessonId: student.lessonId,
-            studentId: student.studentId,
-            teacherId: student.teacherId,
-          },
-        });
-      } else {
-        try {
+      try {
+        if (student.selectedColor === null) {
+          await axios.delete("/ampel", {
+            params: {
+              lessonId: student.lessonId,
+              studentId: student.studentId,
+              teacherId: student.teacherId,
+            },
+          });
+        } else {
           const body = {
             lessonId: student.lessonId,
             studentId: student.studentId,
@@ -356,11 +354,9 @@ export default defineComponent({
           const updated = response.data;
           student.selectedColor = updated.farbe;
           student.note = updated.bemerkung;
-        } catch (error: any) {
-          snackbar.push(
-            "Fehler beim Speichern der Ampel. Melde dich bitte beim Systemadministrator!"
-          );
         }
+      } catch (error: any) {
+        M.toast({html: "Fehler beim Speichern der Ampel. Melde dich bitte beim Systemadministrator!"})
       }
     },
 

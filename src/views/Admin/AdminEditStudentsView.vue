@@ -28,8 +28,6 @@ import { useAuthenticationStore } from "@/stores/AuthenticationStore";
 import { useRouter } from "vue-router";
 import EditStudents from "@/components/Admin/AdminEditStudents.vue";
 const authenticationStore = useAuthenticationStore();
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 const router = useRouter();
 const title = "Schüler bearbeiten";
 async function logout() {
@@ -38,10 +36,10 @@ async function logout() {
     if (success) {
       await router.push("/");
     } else {
-      snackbar.push("Logout fehlgeschlagen.");
+      M.toast({html: "Logout fehlgeschlagen."});
     }
   } catch (error) {
-    snackbar.push("Logout fehlgeschlagen: " + error);
+    M.toast({html: "Logout fehlgeschlagen: " + error});
   }
 }
 async function goBack() {

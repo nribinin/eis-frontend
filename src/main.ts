@@ -5,16 +5,10 @@ import persistedstate from "pinia-plugin-persistedstate"; // Plugin importieren
 import "materialize-css/dist/css/materialize.min.css";
 import App from "./App.vue";
 import router from "./router";
-import axios from "axios";
-import { createVuetify } from "vuetify";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
-import "vuetify/styles";
+import axios, {HttpStatusCode} from "axios";
 import 'choices.js/public/assets/styles/choices.min.css'
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
 const app = createApp(App);
-app.use(createVuetify({ components, directives }));
 
 // Pinia einrichten und Persist Plugin hinzufügen
 const pinia = createPinia();
@@ -22,8 +16,6 @@ pinia.use(persistedstate);
 app.use(pinia);
 
 app.use(router);
-
-const snackbar = useSnackbarStore();
 
 axios.defaults.baseURL = (import.meta.env.VITE_API ?? '') + '/eis/api'
 //axios.defaults.baseURL = "http://10.2.24.50:10001/api";
@@ -35,21 +27,22 @@ axios.interceptors.request.use((request) => {
   return request;
 });
 axios.interceptors.response.use(null, (error) => {
-  if (error.response.status == 401) {
-    snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
-    router.push("/");
+  console.log(error.config?.method);
+  if (error.response.status == HttpStatusCode.Unauthorized) {
+    if (error.config?.method?.toLowerCase() == 'get') {
+      M.toast({html: 'Sie müssen sich einloggen, um diese Seite anzuzeigen.'})
+    } else {
+      M.toast({html: 'Session abgelaufen, bitte loggen Sie sich erneut ein.'})
+    }
   }
-  if (error.response.status == 403) {
-    snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
+  /*if ((error.response.status == HttpStatusCode.BadRequest || error.response.status == HttpStatusCode.ImUsed) && error.response?.data != null) {
+    M.toast({html: error.response?.data});
+  }*/
+  if (error.response.status == HttpStatusCode.Forbidden) {
+    M.toast({html: 'Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.'})
   }
-  if (error.response.status == 400 && error.response.data === "Bad credentials") {
-    snackbar.push("Benutzername oder Passwort falsch.");
-  }
-  else if (error.response.status == 400 && error.response.data === "Empty Password") {
-    snackbar.push("Passwort darf nicht leer sein.");
-  }
-  else if (error.response.status == 400 && error.response.data === "Benutzer nicht gefunden") {
-    snackbar.push("Username nicht gefunden.");
+  if (error.response.status >= 500) {
+    M.toast({html: 'Serverfehler, bitte melden Sie sich bitte beim Systemadministrator!'})
   }
   return Promise.reject(error);
 });

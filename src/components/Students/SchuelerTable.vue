@@ -214,9 +214,7 @@
 import { ref, computed, onMounted } from "vue";
 import { format } from "date-fns";
 import testdata from "@/assets/testdaten.json";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 import axios from "axios";
-const snackbar = useSnackbarStore();
 
 interface Subject {
   ampelId: number;
@@ -251,9 +249,9 @@ const fetchSubjects = async () => {
     const response = await axios.get("/student-ampel/getSchueler");
     subjectList.value = response.data;
   } catch (error) {
-    snackbar.push(
+    M.toast({html:
       "Fehler beim Laden deiner Ampeln. Melde dich bitte beim Systemadministrator!"
-    );
+    });
   }
 };
 

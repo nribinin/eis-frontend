@@ -12,7 +12,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
   const displayName = ref<string | null>(null)
 
 
-  async function login(loginRequest: LoginRequest): Promise<boolean> {
+  async function login(loginRequest: LoginRequest): Promise<void> {
     const response = await axios.post<
       Authentication,
       AxiosResponse<Authentication>,
@@ -21,10 +21,7 @@ export const useAuthenticationStore = defineStore("authentication", () => {
 
     if (response.status === 200) {
       setAuthentication(response.data)
-      console.log(response.data)
-      return true
     }
-    return false
   }
 
   async function logout(): Promise<boolean> {

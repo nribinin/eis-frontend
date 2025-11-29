@@ -221,7 +221,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, nextTick } from "vue";
 import axios from "axios";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
 // Declarations
 declare const M: any;
@@ -242,7 +241,6 @@ interface HitclassOption {
 export default defineComponent({
   name: "KvStudentManagement",
   setup() {
-    const snackbar = useSnackbarStore();
 
     // State: Schüler
     const students = ref<StudentDto[]>([]);
@@ -294,7 +292,7 @@ export default defineComponent({
         const resp = await axios.get("/admin/getAllStudents");
         students.value = resp.data;
       } catch (error) {
-        snackbar.push("Fehler beim Laden der Schüler: " + error);
+        M.toast({html: "Fehler beim Laden der Schüler: " + error});
       }
     }
 
@@ -304,7 +302,7 @@ export default defineComponent({
         allHitclasses.value = resp.data;
         nextTick(() => initMaterializeSelects());
       } catch (error) {
-        snackbar.push("Fehler beim Laden der Klassen: " + error);
+        M.toast({html: "Fehler beim Laden der Klassen: " + error});
       }
     }
 
@@ -319,7 +317,7 @@ export default defineComponent({
         };
         const resp = await axios.post("/admin/newStudent", body);
         if (resp.status === 200 || resp.status === 201) {
-          snackbar.push("Schüler erfolgreich angelegt!");
+          M.toast({html: "Schüler erfolgreich angelegt!"});
           // Reset
           newStudentVorname.value = "";
           newStudentNachname.value = "";
@@ -328,10 +326,7 @@ export default defineComponent({
           fetchStudents();
         }
       } catch (error: any) {
-        snackbar.push(
-          "Fehler beim Anlegen: " +
-            (error.response?.data ?? error)
-        );
+        M.toast({html: "Fehler beim Anlegen: " + (error.response?.data ?? error)});
       }
     }
 
@@ -374,14 +369,11 @@ export default defineComponent({
         };
         const resp = await axios.put("/admin/updateStudent", body);
         if (resp.status === 200) {
-          snackbar.push("Schüler aktualisiert!");
+          M.toast({html: "Schüler aktualisiert!"});
           fetchStudents();
         }
       } catch (error: any) {
-        snackbar.push(
-          "Fehler beim Aktualisieren: " +
-            (error.response?.data ?? error)
-        );
+        M.toast({html: "Fehler beim Aktualisieren: " + (error.response?.data ?? error)});
       }
     }
 
@@ -425,11 +417,11 @@ export default defineComponent({
         await axios.delete(
           `/admin/deleteStudent/${studentToDelete.value.studentKennzahl}`
         );
-        snackbar.push("Schüler erfolgreich gelöscht.");
+        M.toast({html: "Schüler erfolgreich gelöscht."});
         studentToDelete.value = null;
         fetchStudents();
       } catch (error) {
-        snackbar.push("Fehler beim Löschen: " + error);
+        M.toast({html: "Fehler beim Löschen: " + error});
       }
     }
 

@@ -4,7 +4,6 @@ import SchuelerView from '@/views/SchuelerView.vue'
 import AdminView from '@/views/Admin/AdminView.vue'
 import {Roles} from "@/enum/Roles.ts"
 import {useAuthenticationStore} from "@/stores/AuthenticationStore.ts"
-import {useSnackbarStore} from "@/stores/SnackbarStore.ts"
 
 
 const router = createRouter({
@@ -92,7 +91,6 @@ const router = createRouter({
 
 router.beforeResolve(async (to, from, next) => {
   const auth = useAuthenticationStore();
-  const snackbar = useSnackbarStore();
 
   // Warten, bis auth geladen ist
   await auth.authPromise;
@@ -112,7 +110,7 @@ router.beforeResolve(async (to, from, next) => {
     (to.meta?.authRequired === true ||
       (to.meta?.role && Array.isArray(to.meta.role) && to.meta.role.length > 0))
   ) {
-    snackbar.push("Sie müssen sich einloggen, um diese Seite anzuzeigen.");
+    M.toast({html: "Sie müssen sich einloggen, um diese Seite anzuzeigen."});
     return next({ name: "login" });
   }
 
@@ -123,7 +121,7 @@ router.beforeResolve(async (to, from, next) => {
     to.meta.role.length > 0 &&
     !to.meta.role.some((role) => auth.roles.includes(role))
   ) {
-    snackbar.push("Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen.");
+    M.toast({html: "Sie haben nicht die notwendigen Berechtigungen, um diese Seite aufzurufen."});
     if (auth.roles.includes(Roles.TEACHER)) {
       return next({ name: "lehrer" });
     } else if (auth.roles.includes(Roles.STUDENT)) {
@@ -132,9 +130,6 @@ router.beforeResolve(async (to, from, next) => {
     return next(false);
   }
 
-  if (to.name !== "login") {
-    snackbar.close() // Close Snackbar if redirect to any page except login and no role issue
-  }
   next();
 });
 export default router

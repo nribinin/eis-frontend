@@ -74,8 +74,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, nextTick } from "vue";
 import axios from "axios";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 
 declare const M: any;
 
@@ -102,7 +100,7 @@ async function fetchHitclasses() {
     const response = await axios.get("/admin/hitclasses/with-teachers");
     hitclasses.value = response.data;
   } catch (error) {
-    snackbar.push("Fehler beim Laden der Klassen: " + error);
+    M.toast({html: "Fehler beim Laden der Klassen: " + error});
   }
 }
 
@@ -113,7 +111,7 @@ async function fetchAllTeachers() {
     data.sort((a, b) => a.name.localeCompare(b.name));
     allTeachers.value = data;
   } catch (error) {
-    snackbar.push("Fehler beim Laden der Lehrer: " + error);
+    M.toast({html: "Fehler beim Laden der Lehrer: " + error});
   }
 }
 
@@ -165,7 +163,7 @@ async function assignKlassenvorstand() {
       await fetchHitclasses();
     }
   } catch (error: any) {
-    snackbar.push("Fehler beim Zuweisen des Klassenvorstands: " + error);
+    M.toast({html: "Fehler beim Zuweisen des Klassenvorstands: " + error});
   } finally {
     assigning.value = false;
   }

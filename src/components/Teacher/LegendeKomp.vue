@@ -60,9 +60,16 @@ import {defineComponent} from "vue";
 
 export default defineComponent({
   name: "LegendeKomp",
+  props: {
+    show: {
+      type: Boolean,
+      default: true,
+      required: false
+    }
+  },
   data() {
     return {
-      legendVisible: true,
+      legendVisible: this.$props.show,
     };
   },
   methods: {

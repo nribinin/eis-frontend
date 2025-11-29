@@ -68,8 +68,6 @@
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { format } from "date-fns";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 
 /** AmpelDto */
 interface AmpelDto {
@@ -114,9 +112,9 @@ onMounted(async () => {
   try {
     const resp = await axios.get("/teacher-ampel/kv/getStudents");
     if (!resp.data || (Array.isArray(resp.data) && resp.data.length === 0)) {
-      snackbar.push(
+      M.toast({html:
         "Schüler konnten nicht geladen werden. Entweder bist du kein KV einer Klasse oder es gab einen Fehler."
-      );
+      });
       return;
     }
 
@@ -138,9 +136,9 @@ onMounted(async () => {
       isOpen: false,
     }));
   } catch (error) {
-    snackbar.push(
+    M.toast({html:
       "Fehler beim Laden der Schüler. Bitte wende dich an den Systemadministrator."
-    );
+    });
   }
 });
 

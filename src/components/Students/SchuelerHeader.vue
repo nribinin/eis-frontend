@@ -12,9 +12,7 @@
 <script lang="ts" setup>
 import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts";
 import { useRouter } from "vue-router";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
 
-const snackbar = useSnackbarStore();
 const router = useRouter();
 const authenticationStore = useAuthenticationStore();
 
@@ -24,10 +22,10 @@ async function logout() {
     if (success) {
       await router.push("/");
     } else {
-      snackbar.push("Logout fehlgeschlagen.");
+      M.toast({html: "Logout fehlgeschlagen."});
     }
   } catch (error) {
-    snackbar.push("Logout fehlgeschlagen");
+    M.toast({html: "Logout fehlgeschlagen"});
   }
 }
 
@@ -68,6 +66,7 @@ const title = authenticationStore.displayName;
   cursor: pointer;
   padding: 0.5rem;
   flex-shrink: 0;
+  color: white;
 }
 
 /* Material Icons Styling */

@@ -121,8 +121,6 @@
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
 import M from "materialize-css";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-const snackbar = useSnackbarStore();
 
 export default defineComponent({
   name: "CsvUploader",
@@ -150,7 +148,7 @@ export default defineComponent({
         if (file.type === "text/csv" || file.name.endsWith(".csv")) {
           selectedFile.value = file;
         } else {
-          snackbar.push("Nur CSV-Dateien sind erlaubt");
+          M.toast({html: "Nur CSV-Dateien sind erlaubt"});
           selectedFile.value = null;
         }
       }
@@ -199,10 +197,10 @@ export default defineComponent({
         await axios.post("/admin/upload", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        snackbar.push("Daten erfolgreich hochgeladen");
+        M.toast({html: "Daten erfolgreich hochgeladen"});
         selectedFile.value = null;
       } catch (error) {
-        snackbar.push("Es ist ein Fehler aufgetreten: " + error);
+        M.toast({html: "Es ist ein Fehler aufgetreten: " + error});
       } finally {
         loading.value = false;
         modalInstance.value?.close();
@@ -212,9 +210,9 @@ export default defineComponent({
     const deleteCsv = async () => {
       try {
         await axios.delete("/admin/deleteAll");
-        snackbar.push("Daten erfolgreich gelöscht");
+        M.toast({html: "Daten erfolgreich gelöscht"});
       } catch (error) {
-        snackbar.push("Es ist ein Fehler aufgetreten: " + error);
+        M.toast({html: "Es ist ein Fehler aufgetreten: " + error});
       } finally {
         loading.value = false;
         modalInstance.value?.close();
@@ -224,9 +222,9 @@ export default defineComponent({
     const deleteAllAmpel = async () => {
       try {
         await axios.delete("/admin/deleteAllAmpel");
-        snackbar.push("Ampeleinträge erfolgreich zurückgesetzt");
+        M.toast({html: "Ampeleinträge erfolgreich zurückgesetzt"});
       } catch (error) {
-        snackbar.push("Es ist ein Fehler aufgetreten: " + error);
+        M.toast({html: "Es ist ein Fehler aufgetreten: " + error});
       } finally {
         loading.value = false;
         modalInstance.value?.close();

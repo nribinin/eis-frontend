@@ -9,9 +9,9 @@
           </div>
           <div class="input-group">
             <label for="password">Password:</label>
-            <input type="password" v-model="form.password" placeholder="Enter your password" required/>
+            <input type="password" v-model="form.password" placeholder="Enter your password" :required="!form.simulate"/>
           </div>
-          <button @click="login">Log In</button>
+          <button>Log In</button>
         </form>
       </div>
     </div>
@@ -19,11 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts"
-import type { LoginRequest } from "@/types/LoginRequest.ts"
-import { useRouter } from "vue-router"
-import { Roles } from "@/enum/Roles.ts"
+import {ref} from "vue"
+import {useAuthenticationStore} from "@/stores/AuthenticationStore.ts"
+import type {LoginRequest} from "@/types/LoginRequest.ts"
+import {useRouter} from "vue-router"
+import {Roles} from "@/enum/Roles.ts"
+import {HttpStatusCode, isAxiosError} from "axios";
 
 const authenticationStore = useAuthenticationStore()
 const router = useRouter()
@@ -31,16 +32,24 @@ const router = useRouter()
 const form = ref<LoginRequest>({
   username: "",
   password: "",
-  simulate: false
+  simulate: import.meta.env.DEV
 })
 
 async function login() {
-  const successful = await authenticationStore.login(form.value)
-  if (successful) {
+  try {
+    await authenticationStore.login(form.value)
     if (authenticationStore.roles.includes(Roles.STUDENT)) {
       router.push("/schueler")
     } else if (authenticationStore.roles.includes(Roles.TEACHER)) {
       router.push("/lehrer")
+    }
+  } catch (error) {
+    if (isAxiosError(error) && error.status == HttpStatusCode.BadRequest) {
+      if (error.response?.data === "Bad credentials") {
+        M.toast({html: 'Benutzername oder Passwort falsch.'})
+      } else {
+        M.toast({html: error.response?.data})
+      }
     }
   }
 }

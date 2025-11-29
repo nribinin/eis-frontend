@@ -35,9 +35,6 @@
 import KV from "@/components/Teacher/KVComponent.vue";
 import { useAuthenticationStore } from "@/stores/AuthenticationStore.ts";
 import { useRouter } from "vue-router";
-import { useSnackbarStore } from "@/stores/SnackbarStore.ts";
-
-const snackbar = useSnackbarStore();
 
 const router = useRouter();
 const authenticationStore = useAuthenticationStore();
@@ -51,10 +48,10 @@ async function logout() {
     if (success) {
       await router.push("/");
     } else {
-      snackbar.push("Logout fehlgeschlagen.");
+      M.toast({html: "Logout fehlgeschlagen."});
     }
   } catch (error) {
-    snackbar.push("Logout fehlgeschlagen: " + error);
+    M.toast({html: "Logout fehlgeschlagen: " + error});
   }
 }
 </script>
